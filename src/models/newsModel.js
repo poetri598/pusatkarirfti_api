@@ -217,7 +217,7 @@ export async function searchFilterSortNews({ search = "", filters = {}, sort = "
   }
 
   // Direct filters
-  const directFilters = ["user_id", "news_type_id"];
+  const directFilters = ["news_type_id", "user_id", "status_id"];
   for (const field of directFilters) {
     if (filters[field] !== undefined && filters[field] !== "") {
       conditions.push(`news.${field} = ?`);
@@ -231,9 +231,9 @@ export async function searchFilterSortNews({ search = "", filters = {}, sort = "
   // Sorting
   if (!isSortEmpty && typeof sort === "string") {
     const [field, dir] = sort.split(":");
-    const validSorts = [...directFilters, "news_name", "news_views", "news_created_at"];
+    const validSorts = [...directFilters, "news_views", "news_created_at"];
     if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
-      if (field === "news_name" || field === "news_views" || field === "news_created_at") {
+      if (field === "news_views" || field === "news_created_at") {
         orderBy = `ORDER BY news.${field} ${dir.toUpperCase()}`;
       } else {
         orderBy = `ORDER BY news.total_relations ASC, news.${field} ${dir.toUpperCase()}`;

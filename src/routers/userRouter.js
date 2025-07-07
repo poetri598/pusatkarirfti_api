@@ -4,6 +4,7 @@ import {
   GetUserAll,
   GetUserById,
   GetUserByUsername,
+  GetUserAllAdmin,
   UpdateUserById,
   UpdateUserByUsername,
   UpdateUserEmailByUsername,
@@ -22,6 +23,7 @@ router.post("/users", uploadImageMiddleware("user_img"), CreateUser);
 
 // === READ ===
 router.get("/users", GetUserAll);
+router.get("/users/admin", GetUserAllAdmin);
 router.get("/users/search", SearchFilterSortUsers);
 router.get("/users/username/:user_name", GetUserByUsername);
 router.get("/users/:user_id", GetUserById);

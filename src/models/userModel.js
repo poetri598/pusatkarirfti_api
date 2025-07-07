@@ -364,6 +364,11 @@ export async function getUserPasswordByUsername(user_name) {
   const [rows] = await db.query(`SELECT user_password FROM tb_users WHERE user_name = ? LIMIT 1`, [user_name]);
   return rows[0];
 }
+// READ ALL ADMIN
+export async function getUserAllAdmin() {
+  const [rows] = await db.query(getUserBaseQuery() + ` WHERE user.role_id = 1 ORDER BY user.user_id DESC`);
+  return rows;
+}
 
 // UPDATE BY USER_NAME
 export async function updateUserByUsername(user_name, user) {

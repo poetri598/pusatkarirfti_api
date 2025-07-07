@@ -434,7 +434,7 @@ export async function searchFilterSortInternships({ search = "", filters = {}, s
     }
   }
 
-  const directFilters = ["internship_type_id", "ipk_id", "company_id", "user_id"];
+  const directFilters = ["internship_type_id", "ipk_id", "company_id", "user_id", "status_id"];
   for (const field of directFilters) {
     if (field === "ipk_id" && filters[field] !== "" && filters[field] !== undefined) {
       conditions.push(`ipk.ipk_no >= ( SELECT ipk_no FROM tb_ipks WHERE ipk_id = ?)`);
@@ -468,7 +468,7 @@ export async function searchFilterSortInternships({ search = "", filters = {}, s
   // Sort
   if (!isSortEmpty && typeof sort === "string") {
     const [field, dir] = sort.split(":");
-    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "internship_name", "internship_views", "internship_created_at"];
+    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "internship_views", "internship_created_at"];
     if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
       let alias = field.includes("_id") ? field : field;
       if (multiSelectFilters.includes(field)) {

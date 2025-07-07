@@ -356,7 +356,7 @@ export async function searchFilterSortTrainings({ search = "", filters = {}, sor
     }
   }
 
-  const directFilters = ["company_id", "user_id"];
+  const directFilters = ["company_id", "user_id", "status_id"];
   for (const field of directFilters) {
     if (filters[field] !== undefined && filters[field] !== "") {
       conditions.push(`training.${field} = ?`);
@@ -384,13 +384,13 @@ export async function searchFilterSortTrainings({ search = "", filters = {}, sor
 
   if (!isSortEmpty && typeof sort === "string") {
     const [field, dir] = sort.split(":");
-    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "training_name", "training_price", "training_views", "training_created_at"];
+    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "training_price", "training_views", "training_created_at"];
     if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
       let alias = field.includes("_id") ? field : field;
       if (multiSelectFilters.includes(field)) {
         alias = `${field.replace("_id", "")}_ids`;
       }
-      if (field === "training_name" || field === "training_price" || field === "training_views" || field === "training_created_at") {
+      if (field === "training_price" || field === "training_views" || field === "training_created_at") {
         orderBy = `ORDER BY trainings.${alias} ${dir.toUpperCase()}`;
       } else {
         orderBy = `ORDER BY trainings.total_relations ASC, trainings.${alias} ${dir.toUpperCase()}`;

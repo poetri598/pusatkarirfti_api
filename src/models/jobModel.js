@@ -549,7 +549,7 @@ export async function searchFilterSortJobs({ search = "", filters = {}, sort = "
 
   if (!isSortEmpty && typeof sort === "string") {
     const [field, dir] = sort.split(":");
-    const validSorts = [...numericFilters, ...dateFilters, ...directFilters, ...multiSelectFilters, "job_name", "job_views", "job_created_at"];
+    const validSorts = [...numericFilters, ...dateFilters, ...directFilters, ...multiSelectFilters, "job_views", "job_created_at"];
     if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
       let alias = field.includes("_id") ? field : field;
       if (multiSelectFilters.includes(field)) {

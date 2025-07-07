@@ -347,7 +347,7 @@ export async function searchFilterSortExpos({ search = "", filters = {}, sort = 
     }
   }
 
-  const directFilters = ["user_id"];
+  const directFilters = ["user_id", "status_id"];
   for (const field of directFilters) {
     if (filters[field] !== undefined && filters[field] !== "") {
       conditions.push(`expo.${field} = ?`);
@@ -375,13 +375,13 @@ export async function searchFilterSortExpos({ search = "", filters = {}, sort = 
 
   if (!isSortEmpty && typeof sort === "string") {
     const [field, dir] = sort.split(":");
-    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "expo_name", "expo_price", "expo_views", "expo_created_at"];
+    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "expo_price", "expo_views", "expo_created_at"];
     if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
       let alias = field.includes("_id") ? field : field;
       if (multiSelectFilters.includes(field)) {
         alias = `${field.replace("_id", "")}_ids`;
       }
-      if (field === "expo_name" || field === "expo_price" || field === "expo_views" || field === "expo_created_at") {
+      if (field === "expo_price" || field === "expo_views" || field === "expo_created_at") {
         orderBy = `ORDER BY expos.${alias} ${dir.toUpperCase()}`;
       } else {
         orderBy = `ORDER BY expos.total_relations ASC, expos.${alias} ${dir.toUpperCase()}`;

@@ -10,6 +10,7 @@ import {
   getUserByNim,
   getUserByPhone,
   getUserPasswordByUsername,
+  getUserAllAdmin,
   updateUserByUsername,
   updateUserEmailByUsername,
   updateUserPasswordByUsername,
@@ -111,6 +112,14 @@ export const GetUserByUsername = controllerHandler(async (req, res) => {
   const user = await getUserByUserName(req.params.user_name);
   if (!user) return fail(res, "Data username tidak ditemukan", 404);
   const sanitizedUser = sanitizeUser(user);
+  return success(res, "Berhasil mengambil data", sanitizedUser, 200);
+});
+
+// READ ALL ADMIN
+export const GetUserAllAdmin = controllerHandler(async (_req, res) => {
+  const rows = await getUserAllAdmin();
+  if (!rows.length) return success(res, "Data masih kosong", [], 200);
+  const sanitizedUser = rows.map(sanitizeUser);
   return success(res, "Berhasil mengambil data", sanitizedUser, 200);
 });
 
