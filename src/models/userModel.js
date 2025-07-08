@@ -6,6 +6,7 @@ const SALT_ROUNDS = 12;
 // CREATE
 export async function createUser(user) {
   const {
+    user_img,
     user_fullname,
     user_name,
     user_nim,
@@ -38,40 +39,35 @@ export async function createUser(user) {
   try {
     await connection.beginTransaction();
     const hashedPassword = await bcrypt.hash(user_password, SALT_ROUNDS);
-    const query = `
-      INSERT INTO tb_users (
-                              user_fullname, 
-                              user_name, 
-                              user_nim, 
-                              user_phone, 
-                              user_email,
-                              user_password,
-                              user_birthdate,
-                              user_admission_date,
-                              user_graduation_date,
-                              age_id,
-                              weight_id,
-                              height_id,
-                              education_id,
-                              program_study_id,
-                              semester_id,
-                              ipk_id,
-                              city_id,
-                              gender_id,
-                              religion_id,
-                              marital_status_id,
-                              dream_position_id,
-                              dream_company_id,
-                              user_is_employed,
-                              current_company_id,
-                              current_position_id,
-                              role_id,
-                              status_id  
-                            )
-        VALUES (
-          ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-        )
-    `;
+    const fields = [
+      "user_fullname",
+      "user_name",
+      "user_nim",
+      "user_phone",
+      "user_email",
+      "user_password",
+      "user_birthdate",
+      "user_admission_date",
+      "user_graduation_date",
+      "age_id",
+      "weight_id",
+      "height_id",
+      "education_id",
+      "program_study_id",
+      "semester_id",
+      "ipk_id",
+      "city_id",
+      "gender_id",
+      "religion_id",
+      "marital_status_id",
+      "dream_position_id",
+      "dream_company_id",
+      "user_is_employed",
+      "current_company_id",
+      "current_position_id",
+      "role_id",
+      "status_id",
+    ];
     const values = [
       user_fullname,
       user_name,
@@ -101,6 +97,12 @@ export async function createUser(user) {
       role_id,
       status_id,
     ];
+    if (typeof user_img !== "undefined") {
+      fields.unshift("user_img");
+      values.unshift(user_img);
+    }
+    const placeholders = fields.map(() => "?").join(", ");
+    const query = `INSERT INTO tb_users (${fields.join(", ")}) VALUES (${placeholders})`;
     const [res] = await connection.query(query, values);
     await connection.commit();
     return { user_id: res.insertId };
@@ -557,7 +559,7 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
 
   // Default
   if (isSearchEmpty && isFiltersEmpty && isSortEmpty) {
-    const [rows] = await db.query(`${baseQuery} GROUP BY user_id ORDER BY user_created_at DESC`);
+    const [rows] = await db.query(`${baseQuery} GROUP BY user.user_id ORDER BY user_created_at DESC`);
     return rows;
   }
 
@@ -613,7 +615,7 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
     "marital_status_id",
     "dream_position_id",
     "dream_company_id",
-    "is_employed",
+    "user_is_employed",
     "current_position_id",
     "current_company_id",
     "role_id",
@@ -660,7 +662,7 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
       "dream_company_name",
       "current_position_name",
       "current_company_name",
-      "is_employed",
+      "user_is_employed",
       "role_name",
       "status_name",
     ];

@@ -35,7 +35,7 @@ export const CreateUser = controllerHandler(async (req, res) => {
     return fail(res, "Konfirmasi password tidak cocok", 400);
   }
   if (req.fileTypeError) return fail(res, req.fileTypeError, 415);
-  const user_img = req.file ? await bufferToBase64(req.file.buffer) : null;
+  const user_img = req.file ? await bufferToBase64(req.file.buffer) : undefined;
   const user_is_employed = Number(payload.user_is_employed ?? 0);
   const current_position_id = user_is_employed === 0 ? null : toNullableInt(payload.current_position_id);
   const current_company_id = user_is_employed === 0 ? null : toNullableInt(payload.current_company_id);
@@ -84,6 +84,12 @@ export const UpdateUserById = controllerHandler(async (req, res) => {
   const user_is_employed = Number(req.body.user_is_employed ?? existing.user_is_employed);
   const current_position_id = user_is_employed === 0 ? null : toNullableInt(req.body.current_position_id, existing.current_position_id);
   const current_company_id = user_is_employed === 0 ? null : toNullableInt(req.body.current_company_id, existing.current_company_id);
+  const inputPassword = req.body.user_password;
+  const isMatch = await bcrypt.compare(inputPassword, existing.user_password);
+  if (!isMatch) return fail(res, "Password salah", 401);
+  console.log("inputPassword:", inputPassword);
+  console.log("existingPasswordHash:", existing.user_password);
+
   await updateUserById(user_id, {
     ...req.body,
     user_img,
