@@ -246,7 +246,7 @@ export async function searchFilterSortNews({ search = "", filters = {}, sort = "
   return rows;
 }
 
-// SEARCH FILTER SORT
+// SEARCH FILTER SORT ACTIVE
 export async function searchFilterSortNewsActive({ search = "", filters = {}, sort = "" }) {
   const baseQuery = getNewsBaseQuery();
 
