@@ -393,3 +393,97 @@ export async function searchFilterSortExpos({ search = "", filters = {}, sort = 
   const [rows] = await db.query(finalQuery, [...values, ...postValues]);
   return rows;
 }
+
+// SEARCH FILTER SORT
+export async function searchFilterSortExposActive({ search = "", filters = {}, sort = "" }) {
+  const baseQuery = getExpoBaseQuery();
+
+  const isSearchEmpty = !search;
+  const isFiltersEmpty = !Object.values(filters).some((v) => v !== undefined && v !== "");
+  const isSortEmpty = !sort;
+
+  let orderBy = `ORDER BY expos.expo_created_at DESC`;
+
+  // Default
+  if (isSearchEmpty && isFiltersEmpty && isSortEmpty) {
+    const [rows] = await db.query(`${baseQuery} WHERE expo.status_id = 1 GROUP BY expo.expo_id ORDER BY expo.expo_created_at DESC`);
+    return rows;
+  }
+
+  const conditions = ["expo.status_id = 1"];
+  const values = [];
+
+  if (!isSearchEmpty) {
+    const keyword = `%${search}%`;
+    conditions.push(`(
+                      expo.expo_name LIKE ? OR 
+                      expo.expo_price LIKE ? OR
+                      expo.expo_location LIKE ? OR 
+                      expo.expo_link LIKE ?  OR 
+                      user.user_fullname LIKE ? OR 
+                      city.city_name LIKE ? OR 
+                      company.company_name LIKE ? OR
+                      country.country_name LIKE ? OR 
+                      education.education_name LIKE ? OR 
+                      expo_tye.expo_type_name LIKE ? OR 
+                      mode.mode_name LIKE ? OR 
+                      position.position_name LIKE ? OR 
+                      program_study.program_study_name LIKE ? OR 
+                      province.province_name LIKE ?)`);
+    values.push(...Array(14).fill(keyword));
+  }
+
+  const dateFilters = ["expo_date", "expo_open_date", "expo_close_date"];
+  for (const field of dateFilters) {
+    if (filters[field]) {
+      conditions.push(`expo.${field} >= ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  const directFilters = ["user_id", "status_id"];
+  for (const field of directFilters) {
+    if (filters[field] !== undefined && filters[field] !== "") {
+      conditions.push(`expo.${field} = ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  const baseWhere = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const innerQuery = `${baseQuery} ${baseWhere} GROUP BY expo.expo_id`;
+  const subquery = `SELECT * FROM (${innerQuery}) AS expos`;
+
+  const postConditions = [];
+  const postValues = [];
+  const multiSelectFilters = ["city_id", "company_id", "country_id", "education_id", "expo_type_id", "mode_id", "position_id", "program_study_id", "province_id"];
+
+  for (const field of multiSelectFilters) {
+    if (filters[field] !== undefined && filters[field] !== "") {
+      const alias = field.replace("_id", "") + "_ids";
+      postConditions.push(`FIND_IN_SET(?, expos.${alias})`);
+      postValues.push(filters[field]);
+    }
+  }
+
+  const finalWhere = postConditions.length ? `WHERE ${postConditions.join(" AND ")}` : "";
+
+  if (!isSortEmpty && typeof sort === "string") {
+    const [field, dir] = sort.split(":");
+    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "expo_price", "expo_views", "expo_created_at"];
+    if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
+      let alias = field.includes("_id") ? field : field;
+      if (multiSelectFilters.includes(field)) {
+        alias = `${field.replace("_id", "")}_ids`;
+      }
+      if (field === "expo_price" || field === "expo_views" || field === "expo_created_at") {
+        orderBy = `ORDER BY expos.${alias} ${dir.toUpperCase()}`;
+      } else {
+        orderBy = `ORDER BY expos.total_relations ASC, expos.${alias} ${dir.toUpperCase()}`;
+      }
+    }
+  }
+
+  const finalQuery = `${subquery} ${finalWhere} ${orderBy}`;
+  const [rows] = await db.query(finalQuery, [...values, ...postValues]);
+  return rows;
+}

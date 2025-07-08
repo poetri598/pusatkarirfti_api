@@ -245,3 +245,64 @@ export async function searchFilterSortNews({ search = "", filters = {}, sort = "
   const [rows] = await db.query(finalQuery, values);
   return rows;
 }
+
+// SEARCH FILTER SORT
+export async function searchFilterSortNewsActive({ search = "", filters = {}, sort = "" }) {
+  const baseQuery = getNewsBaseQuery();
+
+  const isSearchEmpty = !search;
+  const isFiltersEmpty = !Object.values(filters).some((v) => v !== undefined && v !== "");
+  const isSortEmpty = !sort;
+
+  let orderBy = `ORDER BY news.news_created_at DESC`;
+
+  // Default
+  if (isSearchEmpty && isFiltersEmpty && isSortEmpty) {
+    const [rows] = await db.query(`${baseQuery} WHERE news.status_id = 1 GROUP BY news.news_id ORDER BY news.news_created_at DESC`);
+    return rows;
+  }
+
+  const conditions = ["news.status_id = 1"];
+  const values = [];
+
+  // Keyword search
+  if (!isSearchEmpty) {
+    const keyword = `%${search}%`;
+    conditions.push(`(
+                        news.news_name LIKE ? OR 
+                        news.news_desc LIKE ? OR 
+                        news.news_tags LIKE ? OR 
+                        user.user_fullname LIKE ? OR 
+                        news_type.news_type_name LIKE ?)`);
+    values.push(...Array(5).fill(keyword));
+  }
+
+  // Direct filters
+  const directFilters = ["news_type_id", "user_id", "status_id"];
+  for (const field of directFilters) {
+    if (filters[field] !== undefined && filters[field] !== "") {
+      conditions.push(`news.${field} = ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  const baseWhere = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const query = `${baseQuery} ${baseWhere} GROUP BY news.news_id`;
+
+  // Sorting
+  if (!isSortEmpty && typeof sort === "string") {
+    const [field, dir] = sort.split(":");
+    const validSorts = [...directFilters, "news_views", "news_created_at"];
+    if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
+      if (field === "news_views" || field === "news_created_at") {
+        orderBy = `ORDER BY news.${field} ${dir.toUpperCase()}`;
+      } else {
+        orderBy = `ORDER BY news.total_relations ASC, news.${field} ${dir.toUpperCase()}`;
+      }
+    }
+  }
+
+  const finalQuery = `${query} ${orderBy}`;
+  const [rows] = await db.query(finalQuery, values);
+  return rows;
+}

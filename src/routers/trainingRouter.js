@@ -10,6 +10,7 @@ import {
   GetTrainingAllExceptSlug,
   IncrementViewBySlug,
   SearchFilterSortTrainings,
+  SearchFilterSortTrainingsActive,
 } from "../controllers/trainingController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
@@ -25,6 +26,7 @@ router.get("/trainings", GetTrainingAll);
 router.get("/trainings/three-latest", GetThreeLatestTraining);
 router.get("/trainings/except/:training_slug", GetTrainingAllExceptSlug);
 router.get("/trainings/slug/:training_slug", GetTrainingBySlug);
+router.get("/trainings/search-active", SearchFilterSortTrainingsActive);
 router.get("/trainings/search", SearchFilterSortTrainings);
 router.get("/trainings/:training_id", GetTrainingById);
 

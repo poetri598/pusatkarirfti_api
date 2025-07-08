@@ -569,3 +569,144 @@ export async function searchFilterSortJobs({ search = "", filters = {}, sort = "
   const [rows] = await db.query(finalQuery, [...values, ...postValues]);
   return rows;
 }
+
+// SEARCH FILTER SORT ACTIVE
+export async function searchFilterSortJobsActive({ search = "", filters = {}, sort = "" }) {
+  const baseQuery = getJobBaseQuery();
+
+  const isSearchEmpty = !search;
+  const isFiltersEmpty = !Object.values(filters).some((v) => v !== undefined && v !== "");
+  const isSortEmpty = !sort;
+
+  // Sorting
+  let orderBy = `ORDER BY jobs.total_relations ASC, jobs.job_created_at DESC`;
+
+  // Default
+  if (isSearchEmpty && isFiltersEmpty && isSortEmpty) {
+    const [rows] = await db.query(`${baseQuery} WHERE job.status_id = 1 GROUP BY job.job_id ORDER BY job.job_created_at DESC`);
+    return rows;
+  }
+
+  const conditions = ["job.status_id = 1"];
+  const values = [];
+
+  // Search
+  if (!isSearchEmpty) {
+    const keyword = `%${search}%`;
+    conditions.push(`(
+      job.job_name LIKE ? OR 
+      job.job_location LIKE ? OR 
+      job.job_link LIKE ? OR
+      job_type.job_type_name LIKE ? OR 
+      ipk.ipk_no LIKE ? OR 
+      company.company_name LIKE ? OR 
+      user.user_fullname LIKE ? OR
+      city.city_name LIKE ? OR 
+      country.country_name LIKE ? OR
+      education.education_name LIKE ? OR 
+      experience.experience_name LIKE ? OR 
+      gender.gender_name LIKE ? OR
+      marital_status.marital_status_name LIKE ? OR 
+      mode.mode_name LIKE ? OR 
+      position.position_name LIKE ? OR
+      program_study.program_study_name LIKE ? OR 
+      province.province_name LIKE ? OR 
+      religion.religion_name LIKE ?
+    )`);
+    values.push(...Array(18).fill(keyword));
+  }
+
+  // Numeric filters
+  const numericFilters = ["job_salary_min", "job_salary_max"];
+  for (const field of numericFilters) {
+    if (field === "job_salary_min" && filters[field] !== undefined && filters[field] !== "") {
+      conditions.push(`job.${field} >= ?`);
+      values.push(filters[field]);
+    } else if (field === "job_salary_max" && filters[field] !== undefined && filters[field] !== "") {
+      conditions.push(`job.${field} <= ?`);
+      values.push(filters[field]);
+    } else if (filters[field] !== undefined && filters[field] !== "") {
+      conditions.push(`job.${field} = ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  // Date filters
+  const dateFilters = ["job_open_date", "job_close_date"];
+  for (const field of dateFilters) {
+    if (filters[field]) {
+      conditions.push(`job.${field} >= ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  // Direct filters
+  const directFilters = ["age_min_id", "age_max_id", "weight_min_id", "weight_max_id", "height_min_id", "height_max_id", "job_type_id", "ipk_id", "company_id", "user_id", "status_id"];
+
+  for (const field of directFilters) {
+    const value = filters[field];
+    if (value !== undefined && value !== "") {
+      if (field === "age_min_id") {
+        conditions.push(`age_min.age_no >= (SELECT age_no FROM tb_ages WHERE age_id = ?)`);
+      } else if (field === "age_max_id") {
+        conditions.push(`age_max.age_no <= (SELECT age_no FROM tb_ages WHERE age_id = ?)`);
+      } else if (field === "weight_min_id") {
+        conditions.push(`weight_min.weight_no >= (SELECT weight_no FROM tb_weights WHERE weight_id = ?)`);
+      } else if (field === "weight_max_id") {
+        conditions.push(`weight_max.weight_no <= (SELECT weight_no FROM tb_weights WHERE weight_id = ?)`);
+      } else if (field === "height_min_id") {
+        conditions.push(`height_min.height_no >= (SELECT height_no FROM tb_heights WHERE height_id = ?)`);
+      } else if (field === "height_max_id") {
+        conditions.push(`height_max.height_no <= (SELECT height_no FROM tb_heights WHERE height_id = ?)`);
+      } else if (field === "ipk_id") {
+        conditions.push(`ipk.ipk_no >= (SELECT ipk_no FROM tb_ipks WHERE ipk_id = ?)`);
+      } else {
+        conditions.push(`job.${field} = ?`);
+      }
+      values.push(value);
+    }
+  }
+
+  // Base where
+  const baseWhere = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const innerQuery = `${baseQuery} ${baseWhere} GROUP BY job.job_id`;
+  const subquery = `SELECT * FROM (${innerQuery}) AS jobs`;
+
+  // Multi-select filters
+  const postConditions = [];
+  const postValues = [];
+  const multiSelectFilters = ["city_id", "country_id", "education_id", "experience_id", "gender_id", "marital_status_id", "mode_id", "position_id", "program_study_id", "province_id", "religion_id"];
+
+  for (const field of multiSelectFilters) {
+    if (filters[field] !== undefined && filters[field] !== "") {
+      const alias = field.replace("_id", "") + "_ids";
+      postConditions.push(`FIND_IN_SET(?, jobs.${alias})`);
+      postValues.push(filters[field]);
+    }
+  }
+
+  // Final where
+  const finalWhere = postConditions.length ? `WHERE ${postConditions.join(" AND ")}` : "";
+
+  if (!isSortEmpty && typeof sort === "string") {
+    const [field, dir] = sort.split(":");
+    const validSorts = [...numericFilters, ...dateFilters, ...directFilters, ...multiSelectFilters, "job_views", "job_created_at"];
+    if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
+      let alias = field.includes("_id") ? field : field;
+      if (multiSelectFilters.includes(field)) {
+        alias = `${field.replace("_id", "")}_ids`;
+      }
+      // Khusus sorting by job_views atau job_created_at tanpa total_relations
+      if (field === "job_views" || field === "job_created_at") {
+        orderBy = `ORDER BY jobs.${alias} ${dir.toUpperCase()}`;
+      } else {
+        orderBy = `ORDER BY jobs.total_relations ASC, jobs.${alias} ${dir.toUpperCase()}`;
+      }
+    }
+  }
+
+  const finalQuery = `${subquery} ${finalWhere} ${orderBy}`;
+  console.log(finalQuery);
+  const [rows] = await db.query(finalQuery, [...values, ...postValues]);
+  return rows;
+}

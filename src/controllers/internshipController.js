@@ -9,6 +9,7 @@ import {
   getInternshipAllExceptSlug,
   incrementViewBySlug,
   searchFilterSortInternships,
+  searchFilterSortInternshipsActive,
 } from "../models/internshipModel.js";
 import { bufferToBase64 } from "../utils/bufferToBase64.js";
 import { generateSlug } from "../utils/generateSlug.js";
@@ -109,6 +110,15 @@ export const SearchFilterSortInternships = controllerHandler(async (req, res) =>
   const { search = "", sort = "" } = req.query;
   const filters = req.query;
   const result = await searchFilterSortInternships({ search, filters, sort });
+  if (!result.length) return success(res, "Data masih kosong", [], 200);
+  return success(res, "Berhasil mengambil data", result, 200);
+});
+
+// SEARCH FILTER SORT ACTIVE
+export const SearchFilterSortInternshipsActive = controllerHandler(async (req, res) => {
+  const { search = "", sort = "" } = req.query;
+  const filters = req.query;
+  const result = await searchFilterSortInternshipsActive({ search, filters, sort });
   if (!result.length) return success(res, "Data masih kosong", [], 200);
   return success(res, "Berhasil mengambil data", result, 200);
 });

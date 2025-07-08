@@ -10,6 +10,7 @@ import {
   GetInternshipAllExceptSlug,
   IncrementViewBySlug,
   SearchFilterSortInternships,
+  SearchFilterSortInternshipsActive,
 } from "../controllers/internshipController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
@@ -25,6 +26,7 @@ router.get("/internships", GetInternshipAll);
 router.get("/internships/three-latest", GetThreeLatestInternship);
 router.get("/internships/except/:internship_slug", GetInternshipAllExceptSlug);
 router.get("/internships/slug/:internship_slug", GetInternshipBySlug);
+router.get("/internships/search-active", SearchFilterSortInternshipsActive);
 router.get("/internships/search", SearchFilterSortInternships);
 router.get("/internships/:internship_id", GetInternshipById);
 

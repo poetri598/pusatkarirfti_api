@@ -1,4 +1,4 @@
-import { createJob, getJobAll, getJobById, updateJobById, deleteJobById, getJobBySlug, getThreeLatestJob, getJobAllExceptSlug, incrementViewBySlug, searchFilterSortJobs } from "../models/jobModel.js";
+import { createJob, getJobAll, getJobById, updateJobById, deleteJobById, getJobBySlug, getThreeLatestJob, getJobAllExceptSlug, incrementViewBySlug, searchFilterSortJobs, searchFilterSortJobsActive } from "../models/jobModel.js";
 
 import { bufferToBase64 } from "../utils/bufferToBase64.js";
 import { generateSlug } from "../utils/generateSlug.js";
@@ -99,6 +99,15 @@ export const SearchFilterSortJobs = controllerHandler(async (req, res) => {
   const { search = "", sort = "" } = req.query;
   const filters = req.query;
   const result = await searchFilterSortJobs({ search, filters, sort });
+  if (!result.length) return success(res, "Data masih kosong", [], 200);
+  return success(res, "Berhasil mengambil data", result, 200);
+});
+
+// SEARCH FILTER SORT ACTIVE
+export const SearchFilterSortJobsActive = controllerHandler(async (req, res) => {
+  const { search = "", sort = "" } = req.query;
+  const filters = req.query;
+  const result = await searchFilterSortJobsActive({ search, filters, sort });
   if (!result.length) return success(res, "Data masih kosong", [], 200);
   return success(res, "Berhasil mengambil data", result, 200);
 });

@@ -12,6 +12,7 @@ import {
   getNewsAllByTypeNameKegiatanPusatKarirFTI,
   getNewsAllByTypeNameKegiatanPusatKarirFTIExceptSlug,
   searchFilterSortNews,
+  searchFilterSortNewsActive,
 } from "../models/newsModel.js";
 import { bufferToBase64 } from "../utils/bufferToBase64.js";
 import { generateSlug } from "../utils/generateSlug.js";
@@ -140,6 +141,15 @@ export const SearchFilterSortNews = controllerHandler(async (req, res) => {
   const { search = "", sort = "" } = req.query;
   const filters = req.query;
   const result = await searchFilterSortNews({ search, filters, sort });
+  if (!result.length) return success(res, "Data masih kosong", [], 200);
+  return success(res, "Berhasil mengambil data", result, 200);
+});
+
+// SEARCH FILTER SORT ACTIVE
+export const SearchFilterSortNewsActive = controllerHandler(async (req, res) => {
+  const { search = "", sort = "" } = req.query;
+  const filters = req.query;
+  const result = await searchFilterSortNewsActive({ search, filters, sort });
   if (!result.length) return success(res, "Data masih kosong", [], 200);
   return success(res, "Berhasil mengambil data", result, 200);
 });

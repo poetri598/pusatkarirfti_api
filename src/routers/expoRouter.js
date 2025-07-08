@@ -1,5 +1,17 @@
 import express from "express";
-import { CreateExpo, GetExpoAll, GetExpoById, UpdateExpoById, DeleteExpoById, GetExpoBySlug, GetThreeLatestExpo, GetExpoAllExceptSlug, IncrementViewBySlug, SearchFilterSortExpos } from "../controllers/expoController.js";
+import {
+  CreateExpo,
+  GetExpoAll,
+  GetExpoById,
+  UpdateExpoById,
+  DeleteExpoById,
+  GetExpoBySlug,
+  GetThreeLatestExpo,
+  GetExpoAllExceptSlug,
+  IncrementViewBySlug,
+  SearchFilterSortExpos,
+  SearchFilterSortExposActive,
+} from "../controllers/expoController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
 import { uploadImageMiddleware } from "../middlewares/uploadImageMiddleware.js";
@@ -14,6 +26,7 @@ router.get("/expos", GetExpoAll);
 router.get("/expos/three-latest", GetThreeLatestExpo);
 router.get("/expos/except/:expo_slug", GetExpoAllExceptSlug);
 router.get("/expos/slug/:expo_slug", GetExpoBySlug);
+router.get("/expos/search-active", SearchFilterSortExposActive);
 router.get("/expos/search", SearchFilterSortExpos);
 router.get("/expos/:expo_id", GetExpoById);
 

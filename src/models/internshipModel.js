@@ -486,3 +486,109 @@ export async function searchFilterSortInternships({ search = "", filters = {}, s
   const [rows] = await db.query(finalQuery, [...values, ...postValues]);
   return rows;
 }
+
+// SEARCH FILTER SORT ACTIVE
+export async function searchFilterSortInternshipsActive({ search = "", filters = {}, sort = "" }) {
+  const baseQuery = getInternshipBaseQuery();
+
+  const isSearchEmpty = !search;
+  const isFiltersEmpty = !Object.values(filters).some((v) => v !== undefined && v !== "");
+  const isSortEmpty = !sort;
+
+  let orderBy = `ORDER BY internships.total_relations ASC, internships.internship_created_at DESC`;
+
+  // Default
+  if (isSearchEmpty && isFiltersEmpty && isSortEmpty) {
+    const [rows] = await db.query(`${baseQuery} WHERE internship.status_id = 1 GROUP BY internship.internship_id ORDER BY internship.internship_created_at DESC`);
+    return rows;
+  }
+
+  const conditions = ["internship.status_id = 1"];
+  const values = [];
+
+  // Search
+  if (!isSearchEmpty) {
+    const keyword = `%${search}%`;
+    conditions.push(`(
+                        internship.internship_name LIKE ? OR 
+                        internship.internship_location LIKE ? OR 
+                        internship.internship_link LIKE ? OR
+                        internship_type.internship_type_name LIKE ? OR 
+                        company.company_name LIKE ? OR 
+                        user.user_fullname LIKE ? OR
+                        ipk.ipk_no LIKE ? OR 
+                        city.city_name LIKE ? OR 
+                        country.country_name LIKE ? OR
+                        education.education_name LIKE ? OR 
+                        gender.gender_name LIKE ? OR 
+                        mode.mode_name LIKE ? OR 
+                        position.position_name LIKE ? OR
+                        program_study.program_study_name LIKE ? OR 
+                        province.province_name LIKE ? OR 
+                        religion.religion_name LIKE ? OR
+                        semester.semester_no LIKE ?
+    )`);
+    values.push(...Array(17).fill(keyword));
+  }
+
+  // Date filters
+  const dateFilters = ["internship_start_date", "internship_end_date", "internship_open_date", "internship_close_date"];
+  for (const field of dateFilters) {
+    if (filters[field]) {
+      conditions.push(`internship.${field} >= ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  const directFilters = ["internship_type_id", "ipk_id", "company_id", "user_id", "status_id"];
+  for (const field of directFilters) {
+    if (field === "ipk_id" && filters[field] !== "" && filters[field] !== undefined) {
+      conditions.push(`ipk.ipk_no >= ( SELECT ipk_no FROM tb_ipks WHERE ipk_id = ?)`);
+      values.push(filters[field]);
+    } else if (filters[field] !== undefined && filters[field] !== "") {
+      conditions.push(`internship.${field} = ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  // Base where
+  const baseWhere = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const innerQuery = `${baseQuery} ${baseWhere} GROUP BY internship.internship_id`;
+  const subquery = `SELECT * FROM (${innerQuery}) AS internships`;
+
+  const postConditions = [];
+  const postValues = [];
+  const multiSelectFilters = ["city_id", "country_id", "education_id", "gender_id", "mode_id", "position_id", "program_study_id", "province_id", "religion_id", "semester_id"];
+
+  for (const field of multiSelectFilters) {
+    if (filters[field] !== undefined && filters[field] !== "") {
+      const alias = field.replace("_id", "") + "_ids";
+      postConditions.push(`FIND_IN_SET(?, internships.${alias})`);
+      postValues.push(filters[field]);
+    }
+  }
+
+  // Final where
+  const finalWhere = postConditions.length ? `WHERE ${postConditions.join(" AND ")}` : "";
+
+  // Sort
+  if (!isSortEmpty && typeof sort === "string") {
+    const [field, dir] = sort.split(":");
+    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "internship_views", "internship_created_at"];
+    if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
+      let alias = field.includes("_id") ? field : field;
+      if (multiSelectFilters.includes(field)) {
+        alias = `${field.replace("_id", "")}_ids`;
+      }
+      if (field === "internship_views" || field === "internship_created_at") {
+        orderBy = `ORDER BY internships.${alias} ${dir.toUpperCase()}`;
+      } else {
+        orderBy = `ORDER BY internships.total_relations ASC, internships.${alias} ${dir.toUpperCase()}`;
+      }
+    }
+  }
+
+  const finalQuery = `${subquery} ${finalWhere} ${orderBy}`;
+  const [rows] = await db.query(finalQuery, [...values, ...postValues]);
+  return rows;
+}

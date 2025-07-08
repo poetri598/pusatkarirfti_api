@@ -402,3 +402,99 @@ export async function searchFilterSortTrainings({ search = "", filters = {}, sor
   const [rows] = await db.query(finalQuery, [...values, ...postValues]);
   return rows;
 }
+
+// SEARCH FILTER SORT ACTIVE
+export async function searchFilterSortTrainingsActive({ search = "", filters = {}, sort = "" }) {
+  const baseQuery = getTrainingBaseQuery();
+
+  const isSearchEmpty = !search;
+  const isFiltersEmpty = !Object.values(filters).some((v) => v !== undefined && v !== "");
+  const isSortEmpty = !sort;
+
+  let orderBy = `ORDER BY trainings.training_created_at DESC`;
+
+  // Default
+  if (isSearchEmpty && isFiltersEmpty && isSortEmpty) {
+    const [rows] = await db.query(`${baseQuery} WHERE training.status_id = 1 GROUP BY training.training_id ORDER BY training.training_created_at DESC`);
+    return rows;
+  }
+
+  const conditions = ["training.status_id = 1"];
+  const values = [];
+
+  // Search
+  if (!isSearchEmpty) {
+    const keyword = `%${search}%`;
+    conditions.push(`(
+                      training.training_name LIKE ? OR 
+                      training.training_price LIKE ? OR
+                      training.training_location LIKE ? OR 
+                      training.training_link LIKE ? OR 
+                      company.company_name LIKE ? OR 
+                      user.user_fullname LIKE ? OR 
+                      city.city_name LIKE ? OR 
+                      country.country_name LIKE ? OR 
+                      education.education_name LIKE ? OR 
+                      mode.mode_name LIKE ? OR 
+                      program_study.program_study_name LIKE ? OR 
+                      province.province_name LIKE ? OR 
+                      semester.semester_no LIKE ? OR 
+                      skill.skill_name LIKE ? OR 
+                      training_type.training_type_name LIKE ?)`);
+    values.push(...Array(15).fill(keyword));
+  }
+
+  const dateFilters = ["training_date", "training_open_date", "training_close_date"];
+  for (const field of dateFilters) {
+    if (filters[field]) {
+      conditions.push(`training.${field} >= ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  const directFilters = ["company_id", "user_id", "status_id"];
+  for (const field of directFilters) {
+    if (filters[field] !== undefined && filters[field] !== "") {
+      conditions.push(`training.${field} = ?`);
+      values.push(filters[field]);
+    }
+  }
+
+  const baseWhere = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const innerQuery = `${baseQuery} ${baseWhere} GROUP BY training.training_id`;
+  const subquery = `SELECT * FROM (${innerQuery}) AS trainings`;
+
+  const postConditions = [];
+  const postValues = [];
+  const multiSelectFilters = ["city_id", "country_id", "education_id", "mode_id", "program_study_id", "province_id", "semester_id", "skill_id", "training_type_id"];
+
+  for (const field of multiSelectFilters) {
+    if (filters[field] !== undefined && filters[field] !== "") {
+      const alias = field.replace("_id", "") + "_ids";
+      postConditions.push(`FIND_IN_SET(?, trainings.${alias})`);
+      postValues.push(filters[field]);
+    }
+  }
+
+  const finalWhere = postConditions.length ? `WHERE ${postConditions.join(" AND ")}` : "";
+
+  if (!isSortEmpty && typeof sort === "string") {
+    const [field, dir] = sort.split(":");
+    const validSorts = [...dateFilters, ...directFilters, ...multiSelectFilters, "training_price", "training_views", "training_created_at"];
+    if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
+      let alias = field.includes("_id") ? field : field;
+      if (multiSelectFilters.includes(field)) {
+        alias = `${field.replace("_id", "")}_ids`;
+      }
+      if (field === "training_price" || field === "training_views" || field === "training_created_at") {
+        orderBy = `ORDER BY trainings.${alias} ${dir.toUpperCase()}`;
+      } else {
+        orderBy = `ORDER BY trainings.total_relations ASC, trainings.${alias} ${dir.toUpperCase()}`;
+      }
+    }
+  }
+
+  const finalQuery = `${subquery} ${finalWhere} ${orderBy}`;
+  const [rows] = await db.query(finalQuery, [...values, ...postValues]);
+  return rows;
+}

@@ -13,6 +13,7 @@ import {
   GetNewsAllByTypeNameKegiatanPusatKarirFTI,
   GetNewsAllByTypeNameKegiatanPusatKarirFTIExceptSlug,
   SearchFilterSortNews,
+  SearchFilterSortNewsActive,
 } from "../controllers/newsController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
@@ -31,6 +32,7 @@ router.get("/news/except/:news_slug", GetNewsAllExceptSlug);
 router.get("/news/kegiatan-pusat-karir-fti", GetNewsAllByTypeNameKegiatanPusatKarirFTI);
 router.get("/news/kegiatan-pusat-karir-fti/except/:news_slug", GetNewsAllByTypeNameKegiatanPusatKarirFTIExceptSlug);
 router.get("/news/slug/:news_slug", GetNewsBySlug);
+router.get("/news/search-active", SearchFilterSortNewsActive);
 router.get("/news/search", SearchFilterSortNews);
 router.get("/news/:news_id", GetNewsById);
 
