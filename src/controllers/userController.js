@@ -5,6 +5,7 @@ import {
   getUserById,
   updateUserById,
   deleteUserById,
+  getUserAllIsEmployed,
   getUserByUserName,
   getUserByEmail,
   getUserByNim,
@@ -112,6 +113,14 @@ export const DeleteUserById = controllerHandler(async (req, res) => {
 });
 
 // ========================================================================================================================================================
+
+// READ ALL IS EMPLOYED
+export const GetUserAllIsEmployed = controllerHandler(async (_req, res) => {
+  const rows = await getUserAllIsEmployed();
+  if (!rows.length) return success(res, "Data masih kosong", [], 200);
+  const sanitizedUser = rows.map(sanitizeUser);
+  return success(res, "Berhasil mengambil data", sanitizedUser, 200);
+});
 
 // READ BY USER_NAME
 export const GetUserByUsername = controllerHandler(async (req, res) => {

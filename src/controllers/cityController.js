@@ -33,7 +33,7 @@ export const UpdateCityById = controllerHandler(async (req, res) => {
   const existing = await getCityById(city_id);
   if (!existing) return fail(res, "Data ID tidak ditemukan", 404);
   const city_name = req.body.city_name ?? existing.city_name;
-  const duplicate = await getCityByName(existing.city_name);
+  const duplicate = await getCityByName(city_name);
   if (duplicate && duplicate.city_id !== Number(existing.city_id)) return fail(res, "Data nama sudah tersedia", 409);
   await updateCityById(city_id, {
     ...req.body,

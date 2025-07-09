@@ -113,9 +113,9 @@ export async function searchFilterSortAges({ search = "", filters = {}, sort = "
   // Sorting
   if (!isSortEmpty && typeof sort === "string") {
     const [field, dir] = sort.split(":");
-    const validSorts = ["age_no", "age_created_at"];
+    const validSorts = ["age_no", "age_created_at", "age_updated_at"];
     if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
-      if (field === "age_no" || field === "age_created_at") {
+      if (field === "age_no" || field === "age_created_at" || field === "age_updated_at") {
         orderBy = `ORDER BY ${field} ${dir.toUpperCase()}`;
       } else {
         orderBy = `ORDER BY ${field} ${dir.toUpperCase()}`;

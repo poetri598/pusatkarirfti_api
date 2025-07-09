@@ -314,7 +314,12 @@ function getUserBaseQuery() {
       user.status_id,
       status.status_name
 
+
+      
+
+
     FROM tb_users  user
+
     LEFT JOIN tb_ages age ON user.age_id = age.age_id
     LEFT JOIN tb_weights weight ON user.weight_id = weight.weight_id
     LEFT JOIN tb_heights height ON user.height_id = height.height_id
@@ -332,10 +337,17 @@ function getUserBaseQuery() {
     LEFT JOIN tb_companies current_company ON user.current_company_id = current_company.company_id
     LEFT JOIN tb_roles role ON user.role_id = role.role_id
     LEFT JOIN tb_statuses status ON user.status_id = status.status_id
+
   `;
 }
 
 //==============================================================================================================================================================
+
+// READ ALL IS EMPLOYED
+export async function getUserAllIsEmployed() {
+  const [rows] = await db.query(getUserBaseQuery() + ` WHERE user.user_is_employed = 1 AND user.status_id = 1 ORDER BY user.user_id DESC`);
+  return rows;
+}
 
 // READ BY USER_NAME
 export async function getUserByUserName(user_name) {
@@ -427,8 +439,8 @@ export async function updateUserByUsername(user_name, user) {
                           dream_position_id   = ?,
                           dream_company_id    = ?,
                           user_is_employed         = ?,
-                          current_position_id    = ?,
                           current_company_id     = ?,
+                          current_position_id    = ?,
                           role_id             = ?,
                           status_id           = ?
       WHERE user_name = ?

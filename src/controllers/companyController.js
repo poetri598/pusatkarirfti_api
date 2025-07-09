@@ -6,7 +6,8 @@ import { controllerHandler } from "../utils/controllerHandler.js";
 // CREATE
 export const CreateCompany = controllerHandler(async (req, res) => {
   const payload = req.body;
-  if (await getCompanyByName(payload.company_name)) return fail(res, "Data nama sudah tersedia", 409);
+  const existing = await getCompanyByName(payload.company_name);
+  if (payload.company_name === existing.company_name) return fail(res, "Data nama sudah tersedia", 409);
   if (req.fileTypeError) return fail(res, req.fileTypeError, 415);
   const company_img = req.file ? await bufferToBase64(req.file.buffer) : null;
   const result = await createCompany({
@@ -68,7 +69,7 @@ export const GetCompanyAllIsPartner = controllerHandler(async (_req, res) => {
 export const SearchFilterSortCompanies = controllerHandler(async (req, res) => {
   const { search = "", sort = "" } = req.query;
   const filters = req.query;
-  const result = await searchFilterSortCompasearchFilterSortCompanies({
+  const result = await searchFilterSortCompanies({
     search,
     filters,
     sort,

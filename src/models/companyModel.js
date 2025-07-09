@@ -100,7 +100,13 @@ function getCompanyBaseQuery() {
             company.company_img,
             company.company_name,
             company.company_desc,
+            company.company_link,
+            company.company_is_partner,
+            company.status_id,
+            status.status_name,
             company.company_created_at,
+            company.company_updated_at,
+
           
             GROUP_CONCAT(DISTINCT industry.industry_id)              AS industry_ids,
             GROUP_CONCAT(DISTINCT industry.industry_name)              AS industry_names
@@ -145,7 +151,7 @@ export async function searchFilterSortCompanies({ search = "", filters = {}, sor
   const isFiltersEmpty = !Object.values(filters).some((v) => v !== undefined && v !== "");
   const isSortEmpty = !sort || !sort.includes(":");
 
-  let orderBy = `ORDER BY company.company_created_at DESC`;
+  let orderBy = `ORDER BY company.company_updated_at DESC`;
 
   if (isSearchEmpty && isFiltersEmpty && isSortEmpty) {
     const [rows] = await db.query(`${baseQuery} GROUP BY company.company_id ${orderBy}`);
@@ -181,7 +187,7 @@ export async function searchFilterSortCompanies({ search = "", filters = {}, sor
   // Sort
   if (!isSortEmpty) {
     const [field, dir] = sort.split(":");
-    const validSorts = [...directFilters, "company_name", "company_created_at"];
+    const validSorts = [...directFilters, "company_name", "company_updated_at", "company_created_at"];
     if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
       orderBy = `ORDER BY company.${field} ${dir.toUpperCase()}`;
     }

@@ -89,10 +89,12 @@ function getStudentRoomBaseQuery() {
     user.user_img,
     user.user_fullname,
     user.user_is_employed,
+    user.program_study_id,
+    program_study.program_study_name,
     user.current_position_id,
-    position.position_name,
+    position.position_name AS current_position_name,
     user.current_company_id,
-    company.company_name,
+    company.company_name AS current_company_name,
     company.company_img,
     user.role_id,
     role.role_name,
@@ -105,6 +107,7 @@ LEFT JOIN tb_users user ON student_room.user_id = user.user_id
 LEFT JOIN tb_roles role ON user.role_id = role.role_id
 LEFT JOIN tb_positions position ON user.current_position_id = position.position_id
 LEFT JOIN tb_companies company ON user.current_company_id = company.company_id
+LEFT JOIN tb_program_studies program_study ON user.program_study_id = program_study.program_study_id
   `;
 }
 
@@ -149,7 +152,7 @@ export async function searchFilterSortStudentRooms({ search = "", filters = {}, 
     conditions.push(`(
                         student_room.student_room_name LIKE ? OR 
                         student_room.student_room_desc LIKE ? OR 
-                        user.user_fullname LIKE ?
+                        user.user_fullname LIKE ? 
                       )`);
     values.push(...Array(3).fill(keyword));
   }

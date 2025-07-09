@@ -3,13 +3,14 @@ import {
   CreateUser,
   GetUserAll,
   GetUserById,
+  UpdateUserById,
+  DeleteUserById,
+  GetUserAllIsEmployed,
   GetUserByUsername,
   GetUserAllAdmin,
-  UpdateUserById,
   UpdateUserByUsername,
   UpdateUserEmailByUsername,
   UpdateUserPasswordByUsername,
-  DeleteUserById,
   DeleteUserByUsername,
   SearchFilterSortUsers,
 } from "../controllers/userController.js";
@@ -23,6 +24,7 @@ router.post("/users", uploadImageMiddleware("user_img"), CreateUser);
 
 // === READ ===
 router.get("/users", GetUserAll);
+router.get("/users/employed", GetUserAllIsEmployed);
 router.get("/users/admin", GetUserAllAdmin);
 router.get("/users/search", SearchFilterSortUsers);
 router.get("/users/username/:user_name", GetUserByUsername);

@@ -114,9 +114,9 @@ export async function searchFilterSortCities({ search = "", filters = {}, sort =
   // Sorting
   if (!isSortEmpty && typeof sort === "string") {
     const [field, dir] = sort.split(":");
-    const validSorts = ["city_name", "city_created_at"];
+    const validSorts = ["city_name", "city_created_at", "city_updated_at"];
     if (validSorts.includes(field) && ["asc", "desc"].includes(dir)) {
-      if (field === "city_name" || field === "city_created_at") {
+      if (field === "city_name" || field === "city_created_at" || field === "city_updated_at") {
         orderBy = `ORDER BY ${field} ${dir.toUpperCase()}`;
       } else {
         orderBy = `ORDER BY ${field} ${dir.toUpperCase()}`;
