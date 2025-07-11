@@ -54,7 +54,7 @@ export const DeleteCountryById = controllerHandler(async (req, res) => {
 export const SearchFilterSortCountries = controllerHandler(async (req, res) => {
   const { search = "", sort = "" } = req.query;
   const filters = req.query;
-  const result = await searchFilterSortCompasearchFilterSortCountries({
+  const result = await searchFilterSortCountries({
     search,
     filters,
     sort,

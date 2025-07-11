@@ -23,6 +23,7 @@ import modeRouter from "./modeRouter.js";
 import newsRouter from "./newsRouter.js";
 import newsTypeRouter from "./newsTypeRouter.js";
 import positionRouter from "./positionRouter.js";
+import profilCdcFtiRouter from "./profilCdcFtiRouter.js";
 import programStudyRouter from "./programStudyRouter.js";
 import provinceRouter from "./provinceRouter.js";
 import religionRouter from "./religionRouter.js";
@@ -62,6 +63,7 @@ export default [
   newsRouter,
   newsTypeRouter,
   positionRouter,
+  profilCdcFtiRouter,
   programStudyRouter,
   provinceRouter,
   religionRouter,

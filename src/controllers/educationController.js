@@ -1,4 +1,4 @@
-import { createEducation, getEducationAll, getEducationById, updateEducationById, deleteEducationById, getEducationByName } from "../models/educationModel.js";
+import { createEducation, getEducationAll, getEducationById, updateEducationById, deleteEducationById, getEducationByName, searchFilterSortEducations } from "../models/educationModel.js";
 
 import { success, fail } from "../utils/responseController.js";
 import { controllerHandler } from "../utils/controllerHandler.js";
@@ -55,7 +55,7 @@ export const DeleteEducationById = controllerHandler(async (req, res) => {
 export const SearchFilterSortEducations = controllerHandler(async (req, res) => {
   const { search = "", sort = "" } = req.query;
   const filters = req.query;
-  const result = await searchFilterSortCompasearchFilterSortEducations({
+  const result = await searchFilterSortEducations({
     search,
     filters,
     sort,

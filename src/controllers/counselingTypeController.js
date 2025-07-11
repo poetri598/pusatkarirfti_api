@@ -55,7 +55,7 @@ export const DeleteCounselingTypeById = controllerHandler(async (req, res) => {
 export const SearchFilterSortCounselingTypes = controllerHandler(async (req, res) => {
   const { search = "", sort = "" } = req.query;
   const filters = req.query;
-  const result = await searchFilterSortCompasearchFilterSortCounselingTypes({
+  const result = await searchFilterSortCounselingTypes({
     search,
     filters,
     sort,
