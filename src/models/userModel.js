@@ -16,6 +16,7 @@ export async function createUser(user) {
     user_birthdate,
     user_admission_date,
     user_graduation_date,
+    user_desc,
     age_id,
     weight_id,
     height_id,
@@ -24,6 +25,8 @@ export async function createUser(user) {
     semester_id,
     ipk_id,
     city_id,
+    province_id,
+    country_id,
     gender_id,
     religion_id,
     marital_status_id,
@@ -57,6 +60,8 @@ export async function createUser(user) {
       "semester_id",
       "ipk_id",
       "city_id",
+      "province_id",
+      "country_id",
       "gender_id",
       "religion_id",
       "marital_status_id",
@@ -86,6 +91,8 @@ export async function createUser(user) {
       semester_id,
       ipk_id,
       city_id,
+      province_id,
+      country_id,
       gender_id,
       religion_id,
       marital_status_id,
@@ -100,6 +107,10 @@ export async function createUser(user) {
     if (typeof user_img !== "undefined") {
       fields.unshift("user_img");
       values.unshift(user_img);
+    }
+    if (typeof user_desc !== "undefined") {
+      fields.push("user_desc");
+      values.push(user_desc);
     }
     const placeholders = fields.map(() => "?").join(", ");
     const query = `INSERT INTO tb_users (${fields.join(", ")}) VALUES (${placeholders})`;
@@ -139,6 +150,7 @@ export async function updateUserById(user_id, user) {
     user_birthdate,
     user_admission_date,
     user_graduation_date,
+    user_desc,
     age_id,
     weight_id,
     height_id,
@@ -147,6 +159,8 @@ export async function updateUserById(user_id, user) {
     semester_id,
     ipk_id,
     city_id,
+    province_id,
+    country_id,
     gender_id,
     religion_id,
     marital_status_id,
@@ -174,6 +188,7 @@ export async function updateUserById(user_id, user) {
                           user_birthdate      = ?,
                           user_admission_date = ?,
                           user_graduation_date= ?,
+                          user_desc           = ?,
                           age_id              = ?,
                           weight_id           = ?,
                           height_id           = ?,
@@ -182,6 +197,8 @@ export async function updateUserById(user_id, user) {
                           semester_id         = ?,
                           ipk_id              = ?,
                           city_id             = ?,
+                          province_id         = ?,
+                          country_id          = ?,
                           gender_id           = ?,
                           religion_id         = ?,
                           marital_status_id   = ?,
@@ -205,6 +222,7 @@ export async function updateUserById(user_id, user) {
       user_birthdate,
       user_admission_date,
       user_graduation_date,
+      user_desc,
       age_id,
       weight_id,
       height_id,
@@ -213,6 +231,8 @@ export async function updateUserById(user_id, user) {
       semester_id,
       ipk_id,
       city_id,
+      province_id,
+      country_id,
       gender_id,
       religion_id,
       marital_status_id,
@@ -256,6 +276,7 @@ function getUserBaseQuery() {
       user.user_birthdate,
       user.user_admission_date,
       user.user_graduation_date,
+      user.user_desc,
       user.user_created_at,
       user.user_updated_at,
 
@@ -282,6 +303,12 @@ function getUserBaseQuery() {
 
       user.city_id,
       city.city_name,
+
+      user.province_id,
+      province.province_name,
+
+      user.country_id,
+      country.country_name,
 
       user.gender_id,
       gender.gender_name,
@@ -328,6 +355,8 @@ function getUserBaseQuery() {
     LEFT JOIN tb_semesters semester ON user.semester_id = semester.semester_id
     LEFT JOIN tb_ipks ipk ON user.ipk_id = ipk.ipk_id
     LEFT JOIN tb_cities city ON user.city_id = city.city_id
+    LEFT JOIN tb_provinces province ON user.province_id = province.province_id
+    LEFT JOIN tb_countries country ON user.country_id = country.country_id
     LEFT JOIN tb_genders gender ON user.gender_id = gender.gender_id
     LEFT JOIN tb_religions religion ON user.religion_id = religion.religion_id
     LEFT JOIN tb_marital_statuses marital_status ON user.marital_status_id = marital_status.marital_status_id
@@ -394,6 +423,7 @@ export async function updateUserByUsername(user_name, user) {
     user_birthdate,
     user_admission_date,
     user_graduation_date,
+    user_desc,
     age_id,
     weight_id,
     height_id,
@@ -402,6 +432,8 @@ export async function updateUserByUsername(user_name, user) {
     semester_id,
     ipk_id,
     city_id,
+    province_id,
+    country_id,
     gender_id,
     religion_id,
     marital_status_id,
@@ -425,6 +457,7 @@ export async function updateUserByUsername(user_name, user) {
                           user_birthdate      = ?,
                           user_admission_date = ?,
                           user_graduation_date= ?,
+                          user_desc           = ?,
                           age_id              = ?,
                           weight_id           = ?,
                           height_id           = ?,
@@ -433,6 +466,8 @@ export async function updateUserByUsername(user_name, user) {
                           semester_id         = ?,
                           ipk_id              = ?,
                           city_id             = ?,
+                          province_id         = ?,
+                          country_id          = ?,
                           gender_id           = ?,
                           religion_id         = ?,
                           marital_status_id   = ?,
@@ -453,6 +488,7 @@ export async function updateUserByUsername(user_name, user) {
       user_birthdate,
       user_admission_date,
       user_graduation_date,
+      user_desc,
       age_id,
       weight_id,
       height_id,
@@ -461,6 +497,8 @@ export async function updateUserByUsername(user_name, user) {
       semester_id,
       ipk_id,
       city_id,
+      province_id,
+      country_id,
       gender_id,
       religion_id,
       marital_status_id,
@@ -583,6 +621,7 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
       user.user_nim LIKE ? OR 
       user.user_phone LIKE ? OR 
       user.user_email LIKE ? OR
+      user.user_desc LIKE ? OR
       age.age_no LIKE ? OR 
       weight.weight_no LIKE ? OR 
       height.height_no LIKE ? OR
@@ -591,6 +630,8 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
       semester.semester_no LIKE ? OR
       ipk.ipk_no LIKE ? OR 
       city.city_name LIKE ? OR 
+      province.province_name LIKE ? OR
+      country.country_name LIKE ? OR
       gender.gender_name LIKE ? OR
       religion.religion_name LIKE ? OR 
       marital_status.marital_status_name LIKE ? OR
@@ -600,7 +641,7 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
       current_company.company_name LIKE ? OR
       role.role_name LIKE ?
     )`);
-    values.push(...Array(20).fill(keyword));
+    values.push(...Array(23).fill(keyword));
   }
 
   // Date Filters
@@ -622,6 +663,8 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
     "semester_id",
     "ipk_id",
     "city_id",
+    "province_id",
+    "country_id",
     "gender_id",
     "religion_id",
     "marital_status_id",
@@ -667,6 +710,8 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
       "semester_no",
       "ipk_no",
       "city_name",
+      "province_name",
+      "country_name",
       "gender_name",
       "religion_name",
       "marital_status_name",
