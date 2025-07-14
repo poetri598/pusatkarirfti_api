@@ -735,3 +735,53 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
   const [rows] = await db.query(finalQuery, values);
   return rows;
 }
+
+//==============================================================================================================================================================
+
+export async function updateUserForCVAndPlatforms(user_id, user, platforms = []) {
+  const { user_fullname, user_email, user_phone, user_desc, city_id, province_id, country_id } = user;
+
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    // Update data user
+    const updateQuery = `
+      UPDATE tb_users
+      SET
+        user_fullname = ?,
+        user_email = ?,
+        user_phone = ?,
+        user_desc = ?,
+        city_id = ?,
+        province_id = ?,
+        country_id = ?
+      WHERE user_id = ?
+    `;
+    const updateValues = [user_fullname, user_email, user_phone, user_desc, city_id, province_id, country_id, user_id];
+    await connection.query(updateQuery, updateValues);
+
+    // Hapus semua platform user
+    await connection.query(`DELETE FROM tb_user_platforms WHERE user_id = ?`, [user_id]);
+
+    // Insert ulang platform jika ada
+    if (Array.isArray(platforms) && platforms.length > 0) {
+      const insertValues = platforms.map((p) => [p.user_platform_name, user_id, p.platform_id]);
+
+      await connection.query(
+        `INSERT INTO tb_user_platforms 
+          (user_platform_name, user_id, platform_id)
+         VALUES ?`,
+        [insertValues]
+      );
+    }
+
+    await connection.commit();
+    return { message: "Berhasil mengubah data dan platform user" };
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
+}

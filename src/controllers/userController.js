@@ -15,6 +15,7 @@ import {
   updateUserByUsername,
   updateUserEmailByUsername,
   updateUserPasswordByUsername,
+  updateUserForCVAndPlatforms,
   deleteUserByUsername,
   searchFilterSortUsers,
 } from "../models/userModel.js";
@@ -229,4 +230,30 @@ export const SearchFilterSortUsers = controllerHandler(async (req, res) => {
   });
   if (!result.length) return success(res, "Data masih kosong", [], 200);
   return success(res, "Berhasil mengambil data", result, 200);
+});
+
+// ========================================================================================================================================================
+
+// UPDATE FOR CV AND PLATFORMS
+export const UpdateUserForCVAndPlatforms = controllerHandler(async (req, res) => {
+  const { user_id, platforms = [] } = req.body;
+  const existing = await getUserById(user_id);
+  if (!existing) return fail(res, "Data ID tidak ditemukan", 404);
+  const user_email = req.body.user_email?.toLowerCase() ?? existing.user_email;
+  const user_phone = req.body.user_phone ?? existing.user_phone;
+  const dupEmail = await getUserByEmail(user_email);
+  if (dupEmail && dupEmail.user_id !== Number(user_id)) return fail(res, "Data email sudah tersedia", 409);
+  const dupPhone = await getUserByPhone(user_phone);
+  if (dupPhone && dupPhone.user_id !== Number(user_id)) return fail(res, "Data nomor handphone sudah tersedia", 409);
+  await updateUserForCVAndPlatforms(
+    user_id,
+    {
+      ...req.body,
+      user_email,
+      user_phone,
+    },
+    platforms
+  );
+  const updated = await getUserById(user_id);
+  return success(res, "Berhasil mengubah data dan platform", sanitizeUser(updated), 200);
 });

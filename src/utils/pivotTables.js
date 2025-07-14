@@ -37,4 +37,5 @@ export const allowedPivotTables = {
   ],
   expos: ["tb_expos_cities", "tb_expos_companies", "tb_expos_countries", "tb_expos_educations", "tb_expos_expo_types", "tb_expos_modes", "tb_expos_positions", "tb_expos_program_studies", "tb_expos_provinces"],
   companies: ["tb_companies_industries"],
+  users: ["tb_user_platforms"],
 };

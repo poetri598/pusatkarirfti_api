@@ -5,7 +5,7 @@ import { allowedPivotTables } from "../utils/pivotTables.js";
 async function refreshPivot(conn, table, column, job_id, ids = [], entity = "jobs") {
   const allowedTablesForEntity = allowedPivotTables[entity] || [];
   if (!allowedTablesForEntity.includes(table)) {
-    throw new Error(`"${table}" pada "${entity}" tidak ditemuka`);
+    throw new Error(`"${table}" pada "${entity}" tidak ditemukan`);
   }
   if (!Array.isArray(ids)) {
     ids = typeof ids === "string" ? ids.split(",").map((v) => Number(v.trim())) : [];

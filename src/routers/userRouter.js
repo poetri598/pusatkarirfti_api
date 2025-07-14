@@ -11,11 +11,12 @@ import {
   UpdateUserByUsername,
   UpdateUserEmailByUsername,
   UpdateUserPasswordByUsername,
+  UpdateUserForCVAndPlatforms,
   DeleteUserByUsername,
   SearchFilterSortUsers,
 } from "../controllers/userController.js";
 import { authenticate, ownerOrAdmin } from "../middlewares/authMiddleware.js";
-import { uploadImageMiddleware } from "../middlewares/uploadImageMiddleware.js";
+import { uploadImageMiddleware, uploadNoneMiddleware } from "../middlewares/uploadImageMiddleware.js";
 
 const router = express.Router();
 
@@ -35,6 +36,7 @@ router.put("/users/:user_id", uploadImageMiddleware("user_img"), UpdateUserById)
 router.put("/users/username/:user_name", uploadImageMiddleware("user_img"), UpdateUserByUsername);
 router.put("/users/email/:user_name", uploadImageMiddleware("user_img"), UpdateUserEmailByUsername);
 router.put("/users/password/:user_name", uploadImageMiddleware("user_img"), UpdateUserPasswordByUsername);
+router.put("/users/cv-platform", UpdateUserForCVAndPlatforms);
 
 // === DELETE ===
 router.delete("/users/:user_id", DeleteUserById);

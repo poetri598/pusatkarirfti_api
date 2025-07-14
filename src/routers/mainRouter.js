@@ -22,6 +22,7 @@ import maritalStatusRouter from "./maritalStatusRouter.js";
 import modeRouter from "./modeRouter.js";
 import newsRouter from "./newsRouter.js";
 import newsTypeRouter from "./newsTypeRouter.js";
+import platFormRouter from "./platformRouter.js";
 import positionRouter from "./positionRouter.js";
 import profilCdcFtiRouter from "./profilCdcFtiRouter.js";
 import programStudyRouter from "./programStudyRouter.js";
@@ -29,12 +30,18 @@ import provinceRouter from "./provinceRouter.js";
 import religionRouter from "./religionRouter.js";
 import roleRouter from "./roleRouter.js";
 import semesterRouter from "./semesterRouter.js";
+import skillLevelRouter from "./skillLevelRouter.js";
 import skillRouter from "./skillRouter.js";
 import statusRouter from "./statusRouter.js";
 import studentRoomRouter from "./studentRoomRouter.js";
 import trainingRouter from "./trainingRouter.js";
 import trainingTypeRouter from "./trainingTypeRouter.js";
+import userAchievementRouter from "./userAchievementRouter.js";
+import userEducationRouter from "./userEducationRouter.js";
+import userOrganizationExperienceRouter from "./userOrganizationExperienceRouter.js";
 import userRouter from "./userRouter.js";
+import userSkillRouter from "./userSkillRouter.js";
+import userWorkExperienceRouter from "./userWorkExperienceRouter.js";
 import weightRouter from "./weightRouter.js";
 
 export default [
@@ -62,6 +69,7 @@ export default [
   modeRouter,
   newsRouter,
   newsTypeRouter,
+  platFormRouter,
   positionRouter,
   profilCdcFtiRouter,
   programStudyRouter,
@@ -69,11 +77,17 @@ export default [
   religionRouter,
   roleRouter,
   semesterRouter,
+  skillLevelRouter,
   skillRouter,
   statusRouter,
   studentRoomRouter,
   trainingRouter,
   trainingTypeRouter,
+  userAchievementRouter,
+  userEducationRouter,
+  userOrganizationExperienceRouter,
   userRouter,
+  userSkillRouter,
+  userWorkExperienceRouter,
   weightRouter,
 ];
