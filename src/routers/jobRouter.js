@@ -1,5 +1,18 @@
 import express from "express";
-import { CreateJob, GetJobAll, GetJobById, UpdateJobById, DeleteJobById, GetJobBySlug, GetThreeLatestJob, GetJobAllExceptSlug, IncrementViewBySlug, SearchFilterSortJobs, SearchFilterSortJobsActive } from "../controllers/jobController.js";
+import {
+  CreateJob,
+  GetJobAll,
+  GetJobById,
+  UpdateJobById,
+  DeleteJobById,
+  GetJobBySlug,
+  GetThreeLatestJob,
+  GetJobAllExceptSlug,
+  IncrementViewBySlug,
+  SearchFilterSortJobs,
+  SearchFilterSortJobsActive,
+  GetJobSummary,
+} from "../controllers/jobController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
 import { uploadImageMiddleware } from "../middlewares/uploadImageMiddleware.js";
@@ -11,6 +24,7 @@ router.post("/jobs", uploadImageMiddleware("job_img"), CreateJob);
 
 // READ
 router.get("/jobs", GetJobAll);
+router.get("/jobs/summary", GetJobSummary);
 router.get("/jobs/three-latest", GetThreeLatestJob);
 router.get("/jobs/except/:job_slug", GetJobAllExceptSlug);
 router.get("/jobs/slug/:job_slug", GetJobBySlug);

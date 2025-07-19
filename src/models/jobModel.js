@@ -710,3 +710,15 @@ export async function searchFilterSortJobsActive({ search = "", filters = {}, so
   const [rows] = await db.query(finalQuery, [...values, ...postValues]);
   return rows;
 }
+
+// GET JOB SUMMARY
+export async function getJobSummary() {
+  const [rows] = await db.query(`
+    SELECT
+      COUNT(*) AS total_all,
+      COUNT(CASE WHEN status_id = 1 THEN 1 END) AS total_status_1,
+      COUNT(CASE WHEN status_id = 2 THEN 1 END) AS total_status_2
+    FROM tb_jobs
+  `);
+  return rows[0];
+}

@@ -6,6 +6,7 @@ import companyRouter from "./companyRouter.js";
 import counselingRouter from "./counselingRouter.js";
 import counselingTypeRouter from "./counselingTypeRouter.js";
 import countryRouter from "./countryRouter.js";
+import cvRouter from "./cvRouter.js";
 import educationRouter from "./educationRouter.js";
 import experienceRouter from "./experienceRouter.js";
 import expoRouter from "./expoRouter.js";
@@ -39,6 +40,7 @@ import trainingTypeRouter from "./trainingTypeRouter.js";
 import userAchievementRouter from "./userAchievementRouter.js";
 import userEducationRouter from "./userEducationRouter.js";
 import userOrganizationExperienceRouter from "./userOrganizationExperienceRouter.js";
+import userPlatformRouter from "./userPlatformRouter.js";
 import userRouter from "./userRouter.js";
 import userSkillRouter from "./userSkillRouter.js";
 import userWorkExperienceRouter from "./userWorkExperienceRouter.js";
@@ -53,6 +55,7 @@ export default [
   counselingRouter,
   counselingTypeRouter,
   countryRouter,
+  cvRouter,
   educationRouter,
   experienceRouter,
   expoRouter,
@@ -86,6 +89,7 @@ export default [
   userAchievementRouter,
   userEducationRouter,
   userOrganizationExperienceRouter,
+  userPlatformRouter,
   userRouter,
   userSkillRouter,
   userWorkExperienceRouter,

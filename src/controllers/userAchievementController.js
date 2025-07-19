@@ -1,42 +1,117 @@
-import { createUserAchievement, getAllUserAchievements, getUserAchievementById, updateUserAchievementById, deleteUserAchievementById } from "../models/userAchievementModel.js";
-import { controllerHandler } from "../utils/controllerHandler.js";
+import {
+  createUserAchievements,
+  getUserAchievementsAll,
+  getUserAchievementById,
+  updateUserAchievementById,
+  deleteUserAchievementById,
+  getUserAchievementsByUsername,
+  deleteUserAchievementsByUsername,
+  updateUserAchievementsByUsername,
+} from "../models/userAchievementModel.js";
 import { success, fail } from "../utils/responseController.js";
+import { controllerHandler } from "../utils/controllerHandler.js";
 
 // CREATE
-export const CreateUserAchievement = controllerHandler(async (req, res) => {
-  const payload = req.body;
-  const result = await createUserAchievement(payload);
-  return success(res, "Berhasil menambahkan data", result, 201);
+export const CreateUserAchievements = controllerHandler(async (req, res) => {
+  const { user_id, achievements } = req.body;
+
+  if (!user_id || !achievements) {
+    return fail(res, "user_id dan achievements diperlukan", 400);
+  }
+
+  let parsedAchievements = achievements;
+  if (typeof achievements === "string") {
+    try {
+      parsedAchievements = JSON.parse(achievements);
+    } catch (err) {
+      return fail(res, "Format achievements tidak valid (harus JSON)", 400);
+    }
+  }
+
+  const result = await createUserAchievements({ user_id, achievements: parsedAchievements });
+  return success(res, "Penghargaan berhasil ditambahkan", result, 201);
 });
 
 // READ ALL
-export const GetAllUserAchievements = controllerHandler(async (_req, res) => {
-  const rows = await getAllUserAchievements();
+export const GetUserAchievementsAll = controllerHandler(async (_req, res) => {
+  const rows = await getUserAchievementsAll();
   if (!rows.length) return success(res, "Data masih kosong", [], 200);
   return success(res, "Berhasil mengambil data", rows, 200);
 });
 
 // READ BY ID
 export const GetUserAchievementById = controllerHandler(async (req, res) => {
-  const row = await getUserAchievementById(req.params.user_achievement_id);
-  if (!row) return fail(res, "Data ID tidak ditemukan", 404);
-  return success(res, "Berhasil mengambil data", row, 200);
+  const { user_achievement_id } = req.params;
+  const achievement = await getUserAchievementById(user_achievement_id);
+  if (!achievement) return fail(res, "Data tidak ditemukan", 404);
+  return success(res, "Berhasil mengambil data", achievement, 200);
 });
 
 // UPDATE BY ID
 export const UpdateUserAchievementById = controllerHandler(async (req, res) => {
   const { user_achievement_id } = req.params;
+
   const existing = await getUserAchievementById(user_achievement_id);
-  if (!existing) return fail(res, "Data ID tidak ditemukan", 404);
-  await updateUserAchievementById(user_achievement_id, req.body);
-  const updated = await getUserAchievementById(user_achievement_id);
-  return success(res, "Berhasil mengubah data", updated, 200);
+  if (!existing) return fail(res, "Data tidak ditemukan", 404);
+
+  const payload = {
+    user_achievement_name: req.body.user_achievement_name ?? existing.user_achievement_name,
+    user_achievement_date: req.body.user_achievement_date ?? existing.user_achievement_date,
+    user_id: req.body.user_id ?? existing.user_id,
+    company_id: req.body.company_id ?? existing.company_id,
+  };
+
+  await updateUserAchievementById(user_achievement_id, payload);
+  return success(res, "Berhasil mengubah data", {}, 200);
 });
 
 // DELETE BY ID
 export const DeleteUserAchievementById = controllerHandler(async (req, res) => {
-  const existing = await getUserAchievementById(req.params.user_achievement_id);
-  if (!existing) return fail(res, "Data ID tidak ditemukan", 404);
-  await deleteUserAchievementById(req.params.user_achievement_id);
-  return success(res, "Berhasil menghapus data", existing, 200);
+  const { user_achievement_id } = req.params;
+  const result = await deleteUserAchievementById(user_achievement_id);
+
+  if (result.affectedRows === 0) return fail(res, "Data tidak ditemukan", 404);
+  return success(res, "Berhasil menghapus data", result, 200);
+});
+
+// ===================================================================================================
+
+// READ BY USERNAME
+export const GetUserAchievementsByUsername = controllerHandler(async (req, res) => {
+  const { username } = req.params;
+  if (!username) return fail(res, "Parameter username diperlukan", 400);
+
+  const rows = await getUserAchievementsByUsername(username);
+  if (!rows.length) return success(res, "Data masih kosong", [], 200);
+  return success(res, "Berhasil mengambil data berdasarkan username", rows, 200);
+});
+
+// DELETE BY USERNAME
+export const DeleteUserAchievementsByUsername = controllerHandler(async (req, res) => {
+  const { username } = req.params;
+  if (!username) return fail(res, "Parameter username diperlukan", 400);
+
+  const result = await deleteUserAchievementsByUsername(username);
+  return success(res, `Berhasil menghapus seluruh data penghargaan berdasarkan username: ${username}`, result, 200);
+});
+
+// UPDATE BY USERNAME
+export const UpdateUserAchievementsByUsername = controllerHandler(async (req, res) => {
+  const { username } = req.params;
+  const { achievements } = req.body;
+
+  if (!username) return fail(res, "Parameter username diperlukan", 400);
+  if (!achievements) return fail(res, "Parameter achievements diperlukan", 400);
+
+  let parsedAchievements = achievements;
+  if (typeof achievements === "string") {
+    try {
+      parsedAchievements = JSON.parse(achievements);
+    } catch (err) {
+      return fail(res, "Format achievements tidak valid (harus JSON)", 400);
+    }
+  }
+
+  const result = await updateUserAchievementsByUsername(username, parsedAchievements);
+  return success(res, `Berhasil memperbarui seluruh data penghargaan untuk username: ${username}`, result, 200);
 });

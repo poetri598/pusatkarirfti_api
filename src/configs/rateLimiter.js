@@ -2,9 +2,9 @@ import rateLimit from "express-rate-limit";
 
 export default function buildRateLimiter() {
   return rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5000, // limit each IP
-    standardHeaders: true, // RateLimit-* headers
+    windowMs: 15 * 60 * 1000,
+    max: 5000,
+    standardHeaders: true,
     legacyHeaders: false,
     message: {
       status: "fail",

@@ -1,75 +1,164 @@
 import db from "../configs/database.js";
 
-// CREATE
-export async function createUserAchievement(data) {
-  const { user_id, company_id, user_achievement_name, user_achievement_date } = data;
+// CREATE (Multiple Insert after Delete for user_id)
+export async function createUserAchievements({ user_id, achievements }) {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
 
-  const query = `
-    INSERT INTO tb_user_achievements (
-      user_id,
-      company_id,
-      user_achievement_name,
-      user_achievement_date
-    ) VALUES (?, ?, ?, ?)
-  `;
-  const values = [user_id, company_id, user_achievement_name, user_achievement_date];
+    // Hapus semua data lama user tersebut
+    await connection.query(`DELETE FROM tb_user_achievements WHERE user_id = ?`, [user_id]);
 
-  const [res] = await db.query(query, values);
-  return { user_achievement_id: res.insertId };
+    const insertedIds = [];
+    for (const achievement of achievements) {
+      const { user_achievement_name, user_achievement_date, company_id } = achievement;
+
+      const [res] = await connection.query(
+        `
+        INSERT INTO tb_user_achievements (
+          user_achievement_name,
+          user_achievement_date,
+          user_id,
+          company_id
+        ) VALUES (?, ?, ?, ?)
+        `,
+        [user_achievement_name, user_achievement_date, user_id, company_id]
+      );
+
+      insertedIds.push(res.insertId);
+    }
+
+    await connection.commit();
+    return insertedIds;
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
 }
 
 // READ ALL
-export async function getAllUserAchievements() {
-  const query = getUserAchievementBaseQuery();
-  const [rows] = await db.query(query);
+export async function getUserAchievementsAll() {
+  const [rows] = await db.query(getAchievementBaseQuery() + ` ORDER BY uach.user_achievement_date DESC`);
   return rows;
 }
 
 // READ BY ID
-export async function getUserAchievementById(id) {
-  const query = getUserAchievementBaseQuery() + ` WHERE ua.user_achievement_id = ?`;
-  const values = [id];
-  const [rows] = await db.query(query, values);
+export async function getUserAchievementById(user_achievement_id) {
+  const [rows] = await db.query(getAchievementBaseQuery() + ` WHERE uach.user_achievement_id = ?`, [user_achievement_id]);
   return rows[0];
 }
 
 // UPDATE BY ID
-export async function updateUserAchievementById(id, data) {
-  const { user_id, company_id, user_achievement_name, user_achievement_date } = data;
+export async function updateUserAchievementById(user_achievement_id, achievement) {
+  const { user_achievement_name, user_achievement_date, user_id, company_id } = achievement;
 
-  const query = `
+  const [result] = await db.query(
+    `
     UPDATE tb_user_achievements SET
-      user_id = ?,
-      company_id = ?,
       user_achievement_name = ?,
-      user_achievement_date = ?
+      user_achievement_date = ?,
+      user_id = ?,
+      company_id = ?
     WHERE user_achievement_id = ?
-  `;
-  const values = [user_id, company_id, user_achievement_name, user_achievement_date, id];
+    `,
+    [user_achievement_name, user_achievement_date, user_id, company_id, user_achievement_id]
+  );
 
-  await db.query(query, values);
+  return result;
 }
 
 // DELETE BY ID
-export async function deleteUserAchievementById(id) {
-  const query = `DELETE FROM tb_user_achievements WHERE user_achievement_id = ?`;
-  const values = [id];
-  await db.query(query, values);
+export async function deleteUserAchievementById(user_achievement_id) {
+  const [result] = await db.query(`DELETE FROM tb_user_achievements WHERE user_achievement_id = ?`, [user_achievement_id]);
+  return result;
 }
 
-// BASE QUERY
-function getUserAchievementBaseQuery() {
+// COMMON SELECT FUNCTION
+function getAchievementBaseQuery() {
   return `
-    SELECT
-      ua.user_achievement_id,
-      ua.user_id,
+    SELECT 
+      uach.user_achievement_id,
+      uach.user_achievement_name,
+      uach.user_achievement_date,
+      uach.user_id,
       u.user_fullname,
-      ua.company_id,
-      c.company_name,
-      ua.user_achievement_name,
-      ua.user_achievement_date
-    FROM tb_user_achievements ua
-    JOIN tb_users u ON ua.user_id = u.user_id
-    JOIN tb_companies c ON ua.company_id = c.company_id
+      u.user_name,
+      uach.company_id,
+      c.company_name
+    FROM tb_user_achievements uach
+    LEFT JOIN tb_users u ON uach.user_id = u.user_id
+    LEFT JOIN tb_companies c ON uach.company_id = c.company_id
   `;
+}
+
+// READ BY USERNAME
+export async function getUserAchievementsByUsername(username) {
+  const [rows] = await db.query(getAchievementBaseQuery() + ` HAVING u.user_name = ? ORDER BY uach.user_achievement_id ASC`, [username]);
+  return rows;
+}
+
+// DELETE ALL BY USERNAME
+export async function deleteUserAchievementsByUsername(username) {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [[user]] = await connection.query(`SELECT user_id FROM tb_users WHERE user_name = ?`, [username]);
+    if (!user) throw new Error("User tidak ditemukan");
+    const user_id = user.user_id;
+
+    const [result] = await connection.query(`DELETE FROM tb_user_achievements WHERE user_id = ?`, [user_id]);
+
+    await connection.commit();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
+}
+
+// UPDATE ALL BY USERNAME
+export async function updateUserAchievementsByUsername(username, achievements) {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [[user]] = await connection.query(`SELECT user_id FROM tb_users WHERE user_name = ?`, [username]);
+    if (!user) throw new Error("User tidak ditemukan");
+    const user_id = user.user_id;
+
+    // Hapus data lama
+    await connection.query(`DELETE FROM tb_user_achievements WHERE user_id = ?`, [user_id]);
+
+    const insertedIds = [];
+    for (const achievement of achievements) {
+      const { user_achievement_name, user_achievement_date, company_id } = achievement;
+
+      const [res] = await connection.query(
+        `
+        INSERT INTO tb_user_achievements (
+          user_achievement_name,
+          user_achievement_date,
+          user_id,
+          company_id
+        ) VALUES (?, ?, ?, ?)
+        `,
+        [user_achievement_name, user_achievement_date, user_id, company_id]
+      );
+
+      insertedIds.push(res.insertId);
+    }
+
+    await connection.commit();
+    return { success: true, insertedIds };
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
 }

@@ -588,6 +588,35 @@ export async function updateUserPasswordByUsername(user_name, user_password) {
   }
 }
 
+// UPDATE USER FIELDS FOR CV BY USERNAME
+export async function updateUserForCV(user_name, user) {
+  const { user_fullname, user_phone, user_email, user_desc, city_id, province_id, country_id } = user;
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+    const query = `
+      UPDATE tb_users SET
+        user_fullname = ?,
+        user_phone    = ?,
+        user_email    = ?,
+        user_desc     = ?,
+        city_id       = ?,
+        province_id   = ?,
+        country_id    = ?
+      WHERE user_name = ?
+    `;
+    const values = [user_fullname, user_phone, user_email, user_desc, city_id, province_id, country_id, user_name];
+    await connection.query(query, values);
+    await connection.commit();
+    return { success: true };
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
+}
+
 // DELETE BY USER_NAME
 export async function deleteUserByUsername(user_name) {
   const [result] = await db.query(`DELETE FROM tb_users WHERE user_name = ?`, [user_name]);
@@ -738,46 +767,39 @@ export async function searchFilterSortUsers({ search = "", filters = {}, sort = 
 
 //==============================================================================================================================================================
 
-export async function updateUserForCVAndPlatforms(user_id, user, platforms = []) {
+// UPDATE USER PROFILE + RESET & INSERT SOCIAL MEDIA
+export async function updateUserProfileWithSocials(user_id, user, platforms) {
   const { user_fullname, user_email, user_phone, user_desc, city_id, province_id, country_id } = user;
-
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
-
-    // Update data user
-    const updateQuery = `
-      UPDATE tb_users
-      SET
+    // 1. Update data user
+    const queryUpdateUser = `
+      UPDATE tb_users SET
         user_fullname = ?,
-        user_email = ?,
-        user_phone = ?,
-        user_desc = ?,
-        city_id = ?,
-        province_id = ?,
-        country_id = ?
+        user_email    = ?,
+        user_phone    = ?,
+        user_desc     = ?,
+        city_id       = ?,
+        province_id   = ?,
+        country_id    = ?
       WHERE user_id = ?
     `;
-    const updateValues = [user_fullname, user_email, user_phone, user_desc, city_id, province_id, country_id, user_id];
-    await connection.query(updateQuery, updateValues);
-
-    // Hapus semua platform user
+    const valuesUpdateUser = [user_fullname, user_email, user_phone, user_desc, city_id, province_id, country_id, user_id];
+    await connection.query(queryUpdateUser, valuesUpdateUser);
+    // 2. Hapus semua sosial media sebelumnya
     await connection.query(`DELETE FROM tb_user_platforms WHERE user_id = ?`, [user_id]);
-
-    // Insert ulang platform jika ada
+    // 3. Insert sosial media baru
     if (Array.isArray(platforms) && platforms.length > 0) {
-      const insertValues = platforms.map((p) => [p.user_platform_name, user_id, p.platform_id]);
-
-      await connection.query(
-        `INSERT INTO tb_user_platforms 
-          (user_platform_name, user_id, platform_id)
-         VALUES ?`,
-        [insertValues]
-      );
+      const insertValues = platforms.map(({ user_platform_name, platform_id }) => [user_platform_name, user_id, platform_id]);
+      const queryInsert = `
+        INSERT INTO tb_user_platforms (user_platform_name, user_id, platform_id)
+        VALUES ?
+      `;
+      await connection.query(queryInsert, [insertValues]);
     }
-
     await connection.commit();
-    return { message: "Berhasil mengubah data dan platform user" };
+    return { success: true };
   } catch (err) {
     await connection.rollback();
     throw err;

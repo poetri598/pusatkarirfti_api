@@ -29,5 +29,4 @@ export const uploadImageMiddleware = (fieldName) => (req, res, next) => {
   });
 };
 
-// Untuk menangani FormData tanpa file (e.g. counseling)
 export const uploadNoneMiddleware = uploadImage.none();

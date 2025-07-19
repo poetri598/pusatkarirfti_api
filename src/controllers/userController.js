@@ -15,7 +15,8 @@ import {
   updateUserByUsername,
   updateUserEmailByUsername,
   updateUserPasswordByUsername,
-  updateUserForCVAndPlatforms,
+  updateUserForCV,
+  updateUserProfileWithSocials,
   deleteUserByUsername,
   searchFilterSortUsers,
 } from "../models/userModel.js";
@@ -212,6 +213,41 @@ export const UpdateUserPasswordByUsername = controllerHandler(async (req, res) =
   return success(res, "Berhasil mengubah data", sanitizeUser(updated), 200);
 });
 
+// UPDATE USER FIELDS FOR CV BY user_name
+export const UpdateUserForCVByUsername = controllerHandler(async (req, res) => {
+  const { user_name } = req.params;
+  const existing = await getUserByUserName(user_name);
+  if (!existing) return fail(res, "Data username tidak ditemukan", 404);
+  const {
+    user_fullname = existing.user_fullname,
+    user_phone = existing.user_phone,
+    user_email = existing.user_email,
+    user_desc = existing.user_desc,
+    city_id = existing.city_id,
+    province_id = existing.province_id,
+    country_id = existing.country_id,
+  } = req.body;
+  const dupEmail = await getUserByEmail(user_email);
+  if (dupEmail && dupEmail.user_name !== user_name) {
+    return fail(res, "Data email sudah tersedia", 409);
+  }
+  const dupPhone = await getUserByPhone(user_phone);
+  if (dupPhone && dupPhone.user_name !== user_name) {
+    return fail(res, "Data nomor handphone sudah tersedia", 409);
+  }
+  await updateUserForCV(user_name, {
+    user_fullname,
+    user_phone,
+    user_email,
+    user_desc,
+    city_id,
+    province_id,
+    country_id,
+  });
+  const updated = await getUserByUserName(user_name);
+  return success(res, "Berhasil mengubah data", sanitizeUser(updated), 200);
+});
+
 // DELETE BY USER_NAME
 export const DeleteUserByUsername = controllerHandler(async (req, res) => {
   const result = await deleteUserByUsername(req.params.user_name);
@@ -234,26 +270,43 @@ export const SearchFilterSortUsers = controllerHandler(async (req, res) => {
 
 // ========================================================================================================================================================
 
-// UPDATE FOR CV AND PLATFORMS
-export const UpdateUserForCVAndPlatforms = controllerHandler(async (req, res) => {
-  const { user_id, platforms = [] } = req.body;
+export const UpdateUserProfileWithSocials = controllerHandler(async (req, res) => {
+  const { user_id, platforms: rawPlatforms, ...payload } = req.body;
+  if (!user_id) return fail(res, "User ID wajib dikirim di body", 400);
   const existing = await getUserById(user_id);
-  if (!existing) return fail(res, "Data ID tidak ditemukan", 404);
-  const user_email = req.body.user_email?.toLowerCase() ?? existing.user_email;
-  const user_phone = req.body.user_phone ?? existing.user_phone;
-  const dupEmail = await getUserByEmail(user_email);
-  if (dupEmail && dupEmail.user_id !== Number(user_id)) return fail(res, "Data email sudah tersedia", 409);
-  const dupPhone = await getUserByPhone(user_phone);
-  if (dupPhone && dupPhone.user_id !== Number(user_id)) return fail(res, "Data nomor handphone sudah tersedia", 409);
-  await updateUserForCVAndPlatforms(
-    user_id,
-    {
-      ...req.body,
-      user_email,
-      user_phone,
-    },
-    platforms
-  );
+  if (!existing) return fail(res, "Data user_id tidak ditemukan", 404);
+  const newEmail = payload.user_email?.toLowerCase() ?? existing.user_email;
+  const dupEmail = await getUserByEmail(newEmail);
+  if (dupEmail && dupEmail.user_id !== Number(user_id)) {
+    return fail(res, "Data email sudah tersedia", 409);
+  }
+  const dupPhone = await getUserByPhone(payload.user_phone);
+  if (dupPhone && dupPhone.user_id !== Number(user_id)) {
+    return fail(res, "Data nomor handphone sudah tersedia", 409);
+  }
+  let platforms;
+  try {
+    platforms = JSON.parse(rawPlatforms);
+  } catch {
+    return fail(res, "Format platforms tidak valid (bukan JSON)", 400);
+  }
+  if (!Array.isArray(platforms)) {
+    return fail(res, "Format data sosial media tidak valid", 400);
+  }
+  const isValidPlatform = platforms.every((p) => typeof p.platform_id === "number" && typeof p.user_platform_name === "string" && p.user_platform_name.trim() !== "");
+  if (!isValidPlatform) {
+    return fail(res, "Data sosial media tidak valid. Pastikan semua platform memiliki ID dan nama yang benar.", 400);
+  }
+  const profileToUpdate = {
+    user_fullname: payload.user_fullname ?? existing.user_fullname,
+    user_email: newEmail,
+    user_phone: payload.user_phone ?? existing.user_phone,
+    user_desc: payload.user_desc ?? existing.user_desc,
+    city_id: payload.city_id ?? existing.city_id,
+    province_id: payload.province_id ?? existing.province_id,
+    country_id: payload.country_id ?? existing.country_id,
+  };
+  await updateUserProfileWithSocials(user_id, profileToUpdate, platforms);
   const updated = await getUserById(user_id);
-  return success(res, "Berhasil mengubah data dan platform", sanitizeUser(updated), 200);
+  return success(res, "Berhasil mengubah profil dan sosial media", sanitizeUser(updated), 200);
 });
