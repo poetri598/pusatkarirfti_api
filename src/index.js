@@ -66,7 +66,7 @@ app.get("/", (_, res) => {
         <p class="text-xs text-center text-gray-500">
           Everything is up & running on port <a>http://localhost:${PORT}</a>
         </p>
-        <a href="https://github.com/Fakultas-Teknologi-Informasi/pusat-karir"
+        <a href="https://github.com/poetri598/pusatkarirfti_api.git"
            class="underline text-cyan-600 text-xs hover:text-cyan-900">
           Read the docs
         </a>
