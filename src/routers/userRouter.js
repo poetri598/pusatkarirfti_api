@@ -15,6 +15,7 @@ import {
   UpdateUserForCVByUsername,
   DeleteUserByUsername,
   SearchFilterSortUsers,
+  GetSummary,
 } from "../controllers/userController.js";
 import { authenticate, ownerOrAdmin } from "../middlewares/authMiddleware.js";
 import { uploadImageMiddleware, uploadNoneMiddleware } from "../middlewares/uploadImageMiddleware.js";
@@ -26,6 +27,7 @@ router.post("/users", uploadImageMiddleware("user_img"), CreateUser);
 
 // === READ ===
 router.get("/users", GetUserAll);
+router.get("/users/summary", GetSummary);
 router.get("/users/employed", GetUserAllIsEmployed);
 router.get("/users/admin", GetUserAllAdmin);
 router.get("/users/search", SearchFilterSortUsers);

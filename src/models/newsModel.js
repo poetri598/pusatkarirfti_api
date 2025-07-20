@@ -306,3 +306,15 @@ export async function searchFilterSortNewsActive({ search = "", filters = {}, so
   const [rows] = await db.query(finalQuery, values);
   return rows;
 }
+
+// GET SUMMARY
+export async function getSummary() {
+  const [rows] = await db.query(`
+    SELECT
+      COUNT(*) AS total_all,
+      COUNT(CASE WHEN status_id = 1 THEN 1 END) AS total_status_1,
+      COUNT(CASE WHEN status_id = 2 THEN 1 END) AS total_status_2
+    FROM tb_news
+  `);
+  return rows[0];
+}

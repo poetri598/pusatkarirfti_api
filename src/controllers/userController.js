@@ -19,6 +19,7 @@ import {
   updateUserProfileWithSocials,
   deleteUserByUsername,
   searchFilterSortUsers,
+  getSummary,
 } from "../models/userModel.js";
 
 import { bufferToBase64 } from "../utils/bufferToBase64.js";
@@ -309,4 +310,11 @@ export const UpdateUserProfileWithSocials = controllerHandler(async (req, res) =
   await updateUserProfileWithSocials(user_id, profileToUpdate, platforms);
   const updated = await getUserById(user_id);
   return success(res, "Berhasil mengubah profil dan sosial media", sanitizeUser(updated), 200);
+});
+
+// GET SUMMARY
+export const GetSummary = controllerHandler(async (_req, res) => {
+  const summary = await getSummary();
+  if (!summary) return success(res, "Data tidak ditemukan", {}, 200);
+  return success(res, "Berhasil mengambil ringkasan data", summary, 200);
 });

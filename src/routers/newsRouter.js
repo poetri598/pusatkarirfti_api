@@ -14,6 +14,7 @@ import {
   GetNewsAllByTypeNameKegiatanPusatKarirFTIExceptSlug,
   SearchFilterSortNews,
   SearchFilterSortNewsActive,
+  GetSummary,
 } from "../controllers/newsController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
@@ -26,6 +27,7 @@ router.post("/news", uploadImageMiddleware("news_img"), CreateNews);
 
 // READ
 router.get("/news", GetNewsAll);
+router.get("/news/summary", GetSummary);
 router.get("/news/three-latest", GetThreeLatestNews);
 router.get("/news/one-most-popular", GetOneMostPopularNews);
 router.get("/news/except/:news_slug", GetNewsAllExceptSlug);

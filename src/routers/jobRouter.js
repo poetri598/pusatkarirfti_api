@@ -11,7 +11,7 @@ import {
   IncrementViewBySlug,
   SearchFilterSortJobs,
   SearchFilterSortJobsActive,
-  GetJobSummary,
+  GetSummary,
 } from "../controllers/jobController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
@@ -24,7 +24,7 @@ router.post("/jobs", uploadImageMiddleware("job_img"), CreateJob);
 
 // READ
 router.get("/jobs", GetJobAll);
-router.get("/jobs/summary", GetJobSummary);
+router.get("/jobs/summary", GetSummary);
 router.get("/jobs/three-latest", GetThreeLatestJob);
 router.get("/jobs/except/:job_slug", GetJobAllExceptSlug);
 router.get("/jobs/slug/:job_slug", GetJobBySlug);

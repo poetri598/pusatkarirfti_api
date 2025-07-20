@@ -1,4 +1,17 @@
-import { createExpo, getExpoAll, getExpoById, updateExpoById, deleteExpoById, getExpoBySlug, getThreeLatestExpo, getExpoAllExceptSlug, incrementViewBySlug, searchFilterSortExpos, searchFilterSortExposActive } from "../models/expoModel.js";
+import {
+  createExpo,
+  getExpoAll,
+  getExpoById,
+  updateExpoById,
+  deleteExpoById,
+  getExpoBySlug,
+  getThreeLatestExpo,
+  getExpoAllExceptSlug,
+  incrementViewBySlug,
+  searchFilterSortExpos,
+  searchFilterSortExposActive,
+  getSummary,
+} from "../models/expoModel.js";
 
 import { bufferToBase64 } from "../utils/bufferToBase64.js";
 import { generateSlug } from "../utils/generateSlug.js";
@@ -110,4 +123,11 @@ export const SearchFilterSortExposActive = controllerHandler(async (req, res) =>
   const result = await searchFilterSortExposActive({ search, filters, sort });
   if (!result.length) return success(res, "Data masih kosong", [], 200);
   return success(res, "Berhasil mengambil data", result, 200);
+});
+
+// GET SUMMARY
+export const GetSummary = controllerHandler(async (_req, res) => {
+  const summary = await getSummary();
+  if (!summary) return success(res, "Data tidak ditemukan", {}, 200);
+  return success(res, "Berhasil mengambil ringkasan data", summary, 200);
 });

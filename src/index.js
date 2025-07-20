@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
+import { startUpdateRoleCron } from "./cron/updateRoleCron.js";
 
 import routers from "./routers/mainRouter.js";
 import validateEnv from "./configs/validateEnv.js";
@@ -80,5 +81,8 @@ app.use(globalErrorHandler); // Error tak ter-handle
 
 // ─── Start Server ───────────────────────────────────────────
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+// ─── Start CRON Job ─────────────────────────────────────────
+startUpdateRoleCron();
 
 export default app;

@@ -711,8 +711,8 @@ export async function searchFilterSortJobsActive({ search = "", filters = {}, so
   return rows;
 }
 
-// GET JOB SUMMARY
-export async function getJobSummary() {
+// GET SUMMARY
+export async function getSummary() {
   const [rows] = await db.query(`
     SELECT
       COUNT(*) AS total_all,

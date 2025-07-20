@@ -1,17 +1,4 @@
-import {
-  createJob,
-  getJobAll,
-  getJobById,
-  updateJobById,
-  deleteJobById,
-  getJobBySlug,
-  getThreeLatestJob,
-  getJobAllExceptSlug,
-  incrementViewBySlug,
-  searchFilterSortJobs,
-  searchFilterSortJobsActive,
-  getJobSummary,
-} from "../models/jobModel.js";
+import { createJob, getJobAll, getJobById, updateJobById, deleteJobById, getJobBySlug, getThreeLatestJob, getJobAllExceptSlug, incrementViewBySlug, searchFilterSortJobs, searchFilterSortJobsActive, getSummary } from "../models/jobModel.js";
 
 import { bufferToBase64 } from "../utils/bufferToBase64.js";
 import { generateSlug } from "../utils/generateSlug.js";
@@ -126,8 +113,8 @@ export const SearchFilterSortJobsActive = controllerHandler(async (req, res) => 
 });
 
 // GET JOB SUMMARY
-export const GetJobSummary = controllerHandler(async (_req, res) => {
-  const summary = await getJobSummary();
+export const GetSummary = controllerHandler(async (_req, res) => {
+  const summary = await getSummary();
   if (!summary) return success(res, "Data tidak ditemukan", {}, 200);
   return success(res, "Berhasil mengambil ringkasan data", summary, 200);
 });

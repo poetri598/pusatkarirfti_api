@@ -807,3 +807,42 @@ export async function updateUserProfileWithSocials(user_id, user, platforms) {
     connection.release();
   }
 }
+
+// GET SUMMARY
+export async function getSummary() {
+  const [rows] = await db.query(`
+    SELECT
+      COUNT(*) AS total_all,
+      COUNT(CASE WHEN status_id = 1 THEN 1 END) AS total_status_1,
+      COUNT(CASE WHEN status_id = 2 THEN 1 END) AS total_status_2,
+      COUNT(CASE WHEN role_id = 1 THEN 1 END) AS total_admin,
+      COUNT(CASE WHEN role_id = 2 THEN 1 END) AS total_mahasiswa,
+      COUNT(CASE WHEN role_id = 3 THEN 1 END) AS total_alumni
+
+    FROM tb_users
+  `);
+  return rows[0];
+}
+
+// UPDATE MAHASISWA KE ALUMNI OTOMATIS
+export async function updateRoleMahasiswaToAlumni() {
+  const connection = await db.getConnection();
+  try {
+    await connection.beginTransaction();
+    const query = `
+      UPDATE tb_users
+      SET role_id = 3
+      WHERE role_id = 2 
+      AND user_graduation_date IS NOT NULL 
+      AND user_graduation_date < CURDATE()
+    `;
+    const [result] = await connection.query(query);
+    await connection.commit();
+    return result;
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
+}

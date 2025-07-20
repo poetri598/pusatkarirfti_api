@@ -11,6 +11,7 @@ import {
   IncrementViewBySlug,
   SearchFilterSortInternships,
   SearchFilterSortInternshipsActive,
+  GetSummary,
 } from "../controllers/internshipController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
@@ -23,6 +24,7 @@ router.post("/internships", uploadImageMiddleware("internship_img"), CreateInter
 
 // READ
 router.get("/internships", GetInternshipAll);
+router.get("/internships/summary", GetSummary);
 router.get("/internships/three-latest", GetThreeLatestInternship);
 router.get("/internships/except/:internship_slug", GetInternshipAllExceptSlug);
 router.get("/internships/slug/:internship_slug", GetInternshipBySlug);

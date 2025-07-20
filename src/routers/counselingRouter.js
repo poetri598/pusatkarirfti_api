@@ -11,6 +11,7 @@ import {
   CountUnreadCounselings,
   CountUnapprovedCounselings,
   SearchFilterSortCounselings,
+  GetSummary,
 } from "../controllers/counselingController.js";
 import { uploadNoneMiddleware } from "../middlewares/uploadImageMiddleware.js";
 
@@ -21,6 +22,7 @@ router.post("/counselings", uploadNoneMiddleware, CreateCounseling);
 
 // READ
 router.get("/counselings", GetCounselingAll);
+router.get("/counselings/summary", GetSummary);
 router.get("/counselings/unapproved/count", CountUnapprovedCounselings);
 router.get("/counselings/unread/count", CountUnreadCounselings);
 router.get("/counselings/user/:user_id", GetCounselingAllByUserId);

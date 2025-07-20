@@ -11,6 +11,7 @@ import {
   IncrementViewBySlug,
   SearchFilterSortTrainings,
   SearchFilterSortTrainingsActive,
+  GetSummary,
 } from "../controllers/trainingController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
@@ -23,6 +24,7 @@ router.post("/trainings", uploadImageMiddleware("training_img"), CreateTraining)
 
 // READ
 router.get("/trainings", GetTrainingAll);
+router.get("/trainings/summary", GetSummary);
 router.get("/trainings/three-latest", GetThreeLatestTraining);
 router.get("/trainings/except/:training_slug", GetTrainingAllExceptSlug);
 router.get("/trainings/slug/:training_slug", GetTrainingBySlug);

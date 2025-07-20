@@ -10,6 +10,7 @@ import {
   incrementViewBySlug,
   searchFilterSortTrainings,
   searchFilterSortTrainingsActive,
+  getSummary,
 } from "../models/trainingModel.js";
 import { bufferToBase64 } from "../utils/bufferToBase64.js";
 import { generateSlug } from "../utils/generateSlug.js";
@@ -121,4 +122,11 @@ export const SearchFilterSortTrainingsActive = controllerHandler(async (req, res
   const result = await searchFilterSortTrainingsActive({ search, filters, sort });
   if (!result.length) return success(res, "Data masih kosong", [], 200);
   return success(res, "Berhasil mengambil data", result, 200);
+});
+
+// GET SUMMARY
+export const GetSummary = controllerHandler(async (_req, res) => {
+  const summary = await getSummary();
+  if (!summary) return success(res, "Data tidak ditemukan", {}, 200);
+  return success(res, "Berhasil mengambil ringkasan data", summary, 200);
 });

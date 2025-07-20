@@ -11,6 +11,7 @@ import {
   IncrementViewBySlug,
   SearchFilterSortExpos,
   SearchFilterSortExposActive,
+  GetSummary,
 } from "../controllers/expoController.js";
 
 import { authenticate, ownerOrAdmin, authorize } from "../middlewares/authMiddleware.js";
@@ -23,6 +24,7 @@ router.post("/expos", uploadImageMiddleware("expo_img"), CreateExpo);
 
 // READ
 router.get("/expos", GetExpoAll);
+router.get("/expos/summary", GetSummary);
 router.get("/expos/three-latest", GetThreeLatestExpo);
 router.get("/expos/except/:expo_slug", GetExpoAllExceptSlug);
 router.get("/expos/slug/:expo_slug", GetExpoBySlug);

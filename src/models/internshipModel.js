@@ -592,3 +592,15 @@ export async function searchFilterSortInternshipsActive({ search = "", filters =
   const [rows] = await db.query(finalQuery, [...values, ...postValues]);
   return rows;
 }
+
+// GET SUMMARY
+export async function getSummary() {
+  const [rows] = await db.query(`
+    SELECT
+      COUNT(*) AS total_all,
+      COUNT(CASE WHEN status_id = 1 THEN 1 END) AS total_status_1,
+      COUNT(CASE WHEN status_id = 2 THEN 1 END) AS total_status_2
+    FROM tb_internships
+  `);
+  return rows[0];
+}
