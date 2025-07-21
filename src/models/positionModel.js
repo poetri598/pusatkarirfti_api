@@ -29,7 +29,7 @@ export async function getPositionAll() {
     getPositionBaseQuery() +
       `
 GROUP BY position_id
-ORDER BY position_created_at DESC`
+ORDER BY position_name ASC`
   );
   return rows;
 }

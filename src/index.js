@@ -20,14 +20,14 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ─── Env Validation ──────────────────────────────────────────
+// Env Validation
 validateEnv();
 const PORT = process.env.PORT || 5000;
 
-// ─── App Init ────────────────────────────────────────────────
+// App Init
 const app = express();
 
-// ─── Security & Essentials ──────────────────────────────────
+// Security & Essentials
 app.use(
   helmet({
     contentSecurityPolicy: false,
@@ -75,14 +75,14 @@ app.get("/", (_, res) => {
   `);
 });
 
-// ─── 404 & Global Error ─────────────────────────────────────
+// 404 & Global Error
 app.use(notFound); // Route tidak ditemukan
 app.use(globalErrorHandler); // Error tak ter-handle
 
-// ─── Start Server ───────────────────────────────────────────
+// Start Server
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
 
-// ─── Start CRON Job ─────────────────────────────────────────
+//  Start CRON Job
 startUpdateRoleCron();
 
 export default app;

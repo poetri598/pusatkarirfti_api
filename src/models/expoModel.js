@@ -331,7 +331,7 @@ export async function searchFilterSortExpos({ search = "", filters = {}, sort = 
                       company.company_name LIKE ? OR
                       country.country_name LIKE ? OR 
                       education.education_name LIKE ? OR 
-                      expo_tye.expo_type_name LIKE ? OR 
+                      expo_type.expo_type_name LIKE ? OR 
                       mode.mode_name LIKE ? OR 
                       position.position_name LIKE ? OR 
                       program_study.program_study_name LIKE ? OR 
@@ -425,7 +425,7 @@ export async function searchFilterSortExposActive({ search = "", filters = {}, s
                       company.company_name LIKE ? OR
                       country.country_name LIKE ? OR 
                       education.education_name LIKE ? OR 
-                      expo_tye.expo_type_name LIKE ? OR 
+                      expo_type.expo_type_name LIKE ? OR 
                       mode.mode_name LIKE ? OR 
                       position.position_name LIKE ? OR 
                       program_study.program_study_name LIKE ? OR 

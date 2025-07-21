@@ -29,7 +29,7 @@ export async function getCountryAll() {
     getCountryBaseQuery() +
       `
 GROUP BY country_id
-ORDER BY country_created_at DESC`
+ORDER BY country_name ASC`
   );
   return rows;
 }

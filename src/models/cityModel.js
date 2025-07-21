@@ -26,7 +26,7 @@ export async function createCity(city) {
 
 // READ ALL
 export async function getCityAll() {
-  const [rows] = await db.query(getCityBaseQuery() + ` GROUP BY city_id ORDER BY city_created_at DESC`);
+  const [rows] = await db.query(getCityBaseQuery() + ` GROUP BY city_id ORDER BY city_name ASC`);
   return rows;
 }
 

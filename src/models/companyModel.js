@@ -48,7 +48,7 @@ export async function createCompany(company) {
 
 // READ ALL
 export async function getCompanyAll() {
-  const [rows] = await db.query(getCompanyBaseQuery() + ` WHERE status.status_id = 1 GROUP BY company.company_id ORDER BY company.company_created_at DESC`);
+  const [rows] = await db.query(getCompanyBaseQuery() + ` WHERE status.status_id = 1 GROUP BY company.company_id ORDER BY company.company_name ASC`);
   return rows;
 }
 
@@ -138,7 +138,7 @@ export async function getCompanyAllIsPartner() {
       ` WHERE status.status_id = 1 
         AND company.company_is_partner = 1 
         GROUP BY company.company_id 
-        ORDER BY company.company_created_at DESC`
+        ORDER BY company.company_name ASC`
   );
   return rows;
 }

@@ -29,7 +29,7 @@ export async function getProgramStudyAll() {
     getProgramStudyBaseQuery() +
       `
 GROUP BY program_study_id
-ORDER BY program_study_created_at DESC`
+ORDER BY program_study_name ASC`
   );
   return rows;
 }

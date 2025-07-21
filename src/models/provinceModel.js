@@ -29,7 +29,7 @@ export async function getProvinceAll() {
     getProvinceBaseQuery() +
       `
 GROUP BY province_id
-ORDER BY province_created_at DESC`
+ORDER BY province_name ASC`
   );
   return rows;
 }

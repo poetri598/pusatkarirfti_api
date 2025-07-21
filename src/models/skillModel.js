@@ -29,7 +29,7 @@ export async function getSkillAll() {
     getSkillBaseQuery() +
       `
 GROUP BY skill_id
-ORDER BY skill_created_at DESC`
+ORDER BY skill_name ASC`
   );
   return rows;
 }
