@@ -95,7 +95,7 @@ function getSkillBaseQuery() {
 
 // READ BY USERNAME
 export async function getUserSkillsByUsername(username) {
-  const [rows] = await db.query(getSkillBaseQuery() + ` HAVING u.user_name = ? ORDER BY uskill.user_skill_id ASC`, [username]);
+  const [rows] = await db.query(getSkillBaseQuery() + ` HAVING u.user_name = ? ORDER BY uskill.user_skill_id DESC`, [username]);
   return rows;
 }
 

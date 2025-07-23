@@ -16,7 +16,7 @@ export const CreateUserWorkExperiences = controllerHandler(async (req, res) => {
   const { user_id, experiences } = req.body;
 
   if (!user_id || !experiences) {
-    return fail(res, "user_id dan user_work_experience diperlukan", 400);
+    return fail(res, "Pengguna dan pengalaman kerja diperlukan", 400);
   }
 
   let parsedExperiences = experiences;
@@ -30,7 +30,7 @@ export const CreateUserWorkExperiences = controllerHandler(async (req, res) => {
   }
 
   const result = await createUserWorkExperiences({ user_id, experiences: parsedExperiences });
-  return success(res, "Pengalaman kerja berhasil ditambahkan", result, 201);
+  return success(res, "Berhasil menambahkan data", result, 201);
 });
 
 // READ ALL
@@ -51,12 +51,9 @@ export const GetUserWorkExperienceById = controllerHandler(async (req, res) => {
 // UPDATE BY ID
 export const UpdateUserWorkExperienceById = controllerHandler(async (req, res) => {
   const { user_work_experience_id } = req.params;
-
   const existing = await getUserWorkExperienceById(user_work_experience_id);
   if (!existing) return fail(res, "Data tidak ditemukan", 404);
-
   let { user_work_experience_descriptions } = req.body;
-
   if (typeof user_work_experience_descriptions === "string") {
     try {
       user_work_experience_descriptions = JSON.parse(user_work_experience_descriptions);
@@ -64,7 +61,6 @@ export const UpdateUserWorkExperienceById = controllerHandler(async (req, res) =
       return fail(res, "Format user_work_experience_descriptions tidak valid (harus JSON)", 400);
     }
   }
-
   const payload = {
     user_work_experience_start_date: req.body.user_work_experience_start_date ?? existing.user_work_experience_start_date,
     user_work_experience_end_date: req.body.user_work_experience_end_date ?? existing.user_work_experience_end_date,
@@ -94,32 +90,32 @@ export const DeleteUserWorkExperienceById = controllerHandler(async (req, res) =
 export const GetUserWorkExperiencesByUsername = controllerHandler(async (req, res) => {
   const { username } = req.params;
   if (!username) {
-    return fail(res, "Parameter username diperlukan", 400);
+    return fail(res, "Pengguna tidak ditemukan", 400);
   }
   const rows = await getUserWorkExperiencesByUsername(username);
   if (!rows.length) return success(res, "Data masih kosong", [], 200);
-  return success(res, "Berhasil mengambil data berdasarkan username", rows, 200);
+  return success(res, "Berhasil mengambil data", rows, 200);
 });
 
 // DELETE BY USERNAME
 export const DeleteUserWorkExperiencesByUsername = controllerHandler(async (req, res) => {
   const { username } = req.params;
   if (!username) {
-    return fail(res, "Parameter username diperlukan", 400);
+    return fail(res, "Pengguna tidak ditemukan", 400);
   }
   const result = await deleteUserWorkExperiencesByUsername(username);
   if (result.affectedRows === 0) {
     return fail(res, `Tidak ada data pengalaman kerja untuk username: ${username}`, 404);
   }
-  return success(res, `Berhasil menghapus semua pengalaman kerja untuk username: ${username}`, result, 200);
+  return success(res, `Berhasil menghapus data`, result, 200);
 });
 
 // UPDATE BY USERNAME
 export const UpdateUserWorkExperiencesByUsername = controllerHandler(async (req, res) => {
   const { username } = req.params;
   const { experiences } = req.body;
-  if (!username) return fail(res, "Parameter username diperlukan", 400);
-  if (!experiences) return fail(res, "Parameter experiences diperlukan", 400);
+  if (!username) return fail(res, "Pengguna tidak ditemukan", 400);
+  if (!experiences) return fail(res, "Masukkan pengalaman kerja", 400);
   let parsedExperiences = experiences;
   if (typeof experiences === "string") {
     try {
@@ -129,5 +125,5 @@ export const UpdateUserWorkExperiencesByUsername = controllerHandler(async (req,
     }
   }
   const result = await updateUserWorkExperiencesByUsername(username, parsedExperiences);
-  return success(res, "Berhasil memperbarui seluruh pengalaman kerja berdasarkan username", result, 200);
+  return success(res, "Berhasil mengubah data", result, 200);
 });

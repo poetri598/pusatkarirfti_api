@@ -95,7 +95,7 @@ function getAchievementBaseQuery() {
 
 // READ BY USERNAME
 export async function getUserAchievementsByUsername(username) {
-  const [rows] = await db.query(getAchievementBaseQuery() + ` HAVING u.user_name = ? ORDER BY uach.user_achievement_id ASC`, [username]);
+  const [rows] = await db.query(getAchievementBaseQuery() + ` HAVING u.user_name = ? ORDER BY uach.user_achievement_date DESC`, [username]);
   return rows;
 }
 

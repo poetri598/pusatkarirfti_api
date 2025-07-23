@@ -11,22 +11,22 @@ export async function createUserEducations({ user_id, educations }) {
 
     const insertedIds = [];
     for (const education of educations) {
-      const { user_education_name, user_education_subject, user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, education_id } = education;
+      const { user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, program_study_id, education_id, company_id } = education;
 
       const [res] = await connection.query(
         `
         INSERT INTO tb_user_educations (
-          user_education_name,
-          user_education_subject,
           user_education_admission_date,
           user_education_graduation_date,
           user_education_is_current,
           user_education_final_score,
           user_id,
-          education_id
+          program_study_id,
+          education_id,
+          company_id
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `,
-        [user_education_name, user_education_subject, user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, user_id, education_id]
+        [user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, user_id, program_study_id, education_id, company_id]
       );
 
       insertedIds.push(res.insertId);
@@ -56,22 +56,22 @@ export async function getUserEducationById(user_education_id) {
 
 // UPDATE BY ID
 export async function updateUserEducationById(user_education_id, education) {
-  const { user_education_name, user_education_subject, user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, user_id, education_id } = education;
+  const { user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, user_id, program_study_id, education_id, company_id } = education;
 
   const [result] = await db.query(
     `
     UPDATE tb_user_educations SET
-      user_education_name = ?,
-      user_education_subject = ?,
       user_education_admission_date = ?,
       user_education_graduation_date = ?,
       user_education_is_current = ?,
       user_education_final_score = ?,
       user_id = ?,
-      education_id = ?
+      program_study_id = ?,
+      education_id = ?,
+      company_id = ?
     WHERE user_education_id = ?
     `,
-    [user_education_name, user_education_subject, user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, user_id, education_id, user_education_id]
+    [user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, user_id, program_study_id, education_id, company_id, user_education_id]
   );
 
   return result;
@@ -88,8 +88,6 @@ function getEducationBaseQuery() {
   return `
     SELECT 
       uedu.user_education_id,
-      uedu.user_education_name,
-      uedu.user_education_subject,
       uedu.user_education_admission_date,
       uedu.user_education_graduation_date,
       uedu.user_education_is_current,
@@ -97,11 +95,18 @@ function getEducationBaseQuery() {
       uedu.user_id,
       u.user_fullname,
       u.user_name,
+      uedu.program_study_id,
+      ps.program_study_name,
       uedu.education_id,
-      e.education_name
+      e.education_name,
+      uedu.company_id,
+      c.company_name,
+      c.company_img
     FROM tb_user_educations uedu
     LEFT JOIN tb_users u ON uedu.user_id = u.user_id
+    LEFT JOIN tb_program_studies ps ON uedu.program_study_id = ps.program_study_id
     LEFT JOIN tb_educations e ON uedu.education_id = e.education_id
+    LEFT JOIN tb_companies c ON uedu.company_id = c.company_id
   `;
 }
 
@@ -147,22 +152,23 @@ export async function updateUserEducationsByUsername(username, educations) {
 
     const insertedIds = [];
     for (const education of educations) {
-      const { user_education_name, user_education_subject, user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, education_id } = education;
+      const { user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, program_study_id, education_id, company_id } = education;
 
       const [res] = await connection.query(
         `
         INSERT INTO tb_user_educations (
-          user_education_name,
-          user_education_subject,
+          
           user_education_admission_date,
           user_education_graduation_date,
           user_education_is_current,
           user_education_final_score,
           user_id,
-          education_id
+          program_study_id,
+          education_id,
+          company_id
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `,
-        [user_education_name, user_education_subject, user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, user_id, education_id]
+        [user_education_admission_date, user_education_graduation_date, user_education_is_current, user_education_final_score, user_id, program_study_id, education_id, company_id]
       );
 
       insertedIds.push(res.insertId);
