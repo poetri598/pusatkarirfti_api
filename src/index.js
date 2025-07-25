@@ -23,7 +23,6 @@ const __dirname = path.dirname(__filename);
 // Env Validation
 validateEnv();
 const PORT = process.env.PORT || 5000;
-const HOST = process.env.DB_HOST || "localhost";
 
 // App Init
 const app = express();
