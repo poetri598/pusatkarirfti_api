@@ -65,7 +65,7 @@ app.get("/", (_, res) => {
           Welcome to the Pusat Karir Fakultas Teknologi Informasi's APIs
         </h1>
         <p class="text-xs text-center text-gray-500">
-          Everything is up & running on port <a>http://localhost:${PORT}</a>
+          Everything is up & running on port <a>https://pusatkarirftiapi-production.up.railway.app/</a>
         </p>
         <a href="https://github.com/poetri598/pusatkarirfti_api.git"
            class="underline text-cyan-600 text-xs hover:text-cyan-900">
@@ -81,7 +81,7 @@ app.use(notFound); // Route tidak ditemukan
 app.use(globalErrorHandler); // Error tak ter-handle
 
 // Start Server
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on https://pusatkarirftiapi-production.up.railway.app/`));
 
 //  Start CRON Job
 startUpdateRoleCron();
