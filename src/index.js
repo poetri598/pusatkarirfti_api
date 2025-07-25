@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 
 // Env Validation
 validateEnv();
-const PORT = process.env.PORT || 22260;
+const PORT = process.env.PORT;
 
 // App Init
 const app = express();
@@ -35,7 +35,7 @@ app.use(
 );
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "pusatkarirfticlient-production.up.railway.app",
+    origin: process.env.CLIENT_URL,
     credentials: true,
   })
 );
