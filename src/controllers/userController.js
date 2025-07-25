@@ -27,6 +27,7 @@ import { success, fail } from "../utils/responseController.js";
 import { controllerHandler } from "../utils/controllerHandler.js";
 import { sanitizeUser } from "../utils/sanitizeUser.js";
 import { toNullableInt } from "../utils/toNullableInt.js";
+import { defaultUserimg, defaultDesc } from "../utils/defaultUser.js";
 
 // CREATE
 export const CreateUser = controllerHandler(async (req, res) => {
@@ -39,14 +40,15 @@ export const CreateUser = controllerHandler(async (req, res) => {
     return fail(res, "Konfirmasi password tidak cocok", 400);
   }
   if (req.fileTypeError) return fail(res, req.fileTypeError, 415);
-  const user_img = req.file ? await bufferToBase64(req.file.buffer) : undefined;
+  const user_img = req.file ? await bufferToBase64(req.file.buffer) : defaultUserimg;
+  const user_desc = payload.user_desc ? payload.user_desc : defaultDesc;
   const user_is_employed = Number(payload.user_is_employed ?? 0);
   const current_position_id = user_is_employed === 0 ? null : toNullableInt(payload.current_position_id);
   const current_company_id = user_is_employed === 0 ? null : toNullableInt(payload.current_company_id);
-
   const result = await createUser({
     ...payload,
     user_img,
+    user_desc,
     user_is_employed,
     current_position_id,
     current_company_id,

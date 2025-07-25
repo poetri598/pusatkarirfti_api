@@ -43,6 +43,7 @@ export async function createUser(user) {
     await connection.beginTransaction();
     const hashedPassword = await bcrypt.hash(user_password, SALT_ROUNDS);
     const fields = [
+      "user_img",
       "user_fullname",
       "user_name",
       "user_nim",
@@ -52,6 +53,7 @@ export async function createUser(user) {
       "user_birthdate",
       "user_admission_date",
       "user_graduation_date",
+      "user_desc",
       "age_id",
       "weight_id",
       "height_id",
@@ -74,6 +76,7 @@ export async function createUser(user) {
       "status_id",
     ];
     const values = [
+      user_img,
       user_fullname,
       user_name,
       user_nim,
@@ -83,6 +86,7 @@ export async function createUser(user) {
       user_birthdate,
       user_admission_date,
       user_graduation_date,
+      user_desc,
       age_id,
       weight_id,
       height_id,
@@ -104,14 +108,14 @@ export async function createUser(user) {
       role_id,
       status_id,
     ];
-    if (typeof user_img !== "undefined") {
-      fields.unshift("user_img");
-      values.unshift(user_img);
-    }
-    if (typeof user_desc !== "undefined") {
-      fields.push("user_desc");
-      values.push(user_desc);
-    }
+    // if (typeof user_img !== "undefined") {
+    //   fields.unshift("user_img");
+    //   values.unshift(defaultUserimg);
+    // }
+    // if (typeof user_desc !== "undefined") {
+    //   fields.push("user_desc");
+    //   values.push(user_desc);
+    // }
     const placeholders = fields.map(() => "?").join(", ");
     const query = `INSERT INTO tb_users (${fields.join(", ")}) VALUES (${placeholders})`;
     const [res] = await connection.query(query, values);
