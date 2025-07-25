@@ -23,6 +23,7 @@ const __dirname = path.dirname(__filename);
 // Env Validation
 validateEnv();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.DB_HOST || "localhost";
 
 // App Init
 const app = express();
@@ -35,7 +36,7 @@ app.use(
 );
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://${HOST}:3000",
     credentials: true,
   })
 );
@@ -64,7 +65,7 @@ app.get("/", (_, res) => {
           Welcome to the Pusat Karir Fakultas Teknologi Informasi's APIs
         </h1>
         <p class="text-xs text-center text-gray-500">
-          Everything is up & running on port <a>http://localhost:${PORT}</a>
+          Everything is up & running on port <a>http://${HOST}:${PORT}</a>
         </p>
         <a href="https://github.com/poetri598/pusatkarirfti_api.git"
            class="underline text-cyan-600 text-xs hover:text-cyan-900">
@@ -80,7 +81,7 @@ app.use(notFound); // Route tidak ditemukan
 app.use(globalErrorHandler); // Error tak ter-handle
 
 // Start Server
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}`));
 
 //  Start CRON Job
 startUpdateRoleCron();
