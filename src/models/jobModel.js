@@ -393,12 +393,10 @@ export async function getThreeLatestJob() {
   const [rows] = await db.query(
     getJobBaseQuery() +
       ` 
-
         WHERE status.status_id = 1
         GROUP BY job.job_id
         ORDER BY job.job_created_at DESC
         LIMIT 3
-
       `
   );
   return rows;

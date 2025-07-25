@@ -1,4 +1,3 @@
-import activityRouter from "./activityRouter.js";
 import ageRouter from "./ageRouter.js";
 import authRouter from "./authRouter.js";
 import cityRouter from "./cityRouter.js";
@@ -47,7 +46,6 @@ import userWorkExperienceRouter from "./userWorkExperienceRouter.js";
 import weightRouter from "./weightRouter.js";
 
 export default [
-  activityRouter,
   ageRouter,
   authRouter,
   cityRouter,
