@@ -11,7 +11,7 @@ const db = mysql.createPool({
   password: DB_PASSWORD,
   database: DB_NAME,
   port: PORT,
-  timezone: "Z",
+  // timezone: "Z",
 });
 
 const testConnection = async () => {
