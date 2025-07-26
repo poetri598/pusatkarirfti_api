@@ -406,11 +406,9 @@ export async function searchFilterSortTrainings({ search = "", filters = {}, sor
 // SEARCH FILTER SORT ACTIVE
 export async function searchFilterSortTrainingsActive({ search = "", filters = {}, sort = "" }) {
   const baseQuery = getTrainingBaseQuery();
-
   const isSearchEmpty = !search;
   const isFiltersEmpty = !Object.values(filters).some((v) => v !== undefined && v !== "");
   const isSortEmpty = !sort;
-
   let orderBy = `ORDER BY trainings.training_created_at DESC`;
 
   // Default
