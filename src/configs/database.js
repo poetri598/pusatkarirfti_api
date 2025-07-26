@@ -11,6 +11,7 @@ const db = mysql.createPool({
   password: DB_PASSWORD,
   database: DB_NAME,
   port: PORT,
+  timezone: "+07:00",
   // timezone: "Z",
 });
 
