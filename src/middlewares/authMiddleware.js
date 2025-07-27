@@ -6,7 +6,6 @@ export function authenticate(req, res, next) {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : null;
   if (!token) return fail(res, "Unauthenticated", 401);
-
   jwt.verify(token, process.env.JWT_ACCESS_TOKEN, (err, payload) => {
     if (err) return fail(res, "Token expired or invalid", 401);
     req.user = payload;
