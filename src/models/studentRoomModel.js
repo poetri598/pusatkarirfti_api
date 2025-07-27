@@ -85,6 +85,7 @@ function getStudentRoomBaseQuery() {
     student_room.student_room_img,
     student_room.student_room_desc,
     student_room.student_room_created_at,
+    student_room.student_room_updated_at,
     student_room.user_id,
     user.user_img,
     user.user_fullname,
