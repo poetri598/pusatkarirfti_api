@@ -10,7 +10,7 @@ const db = mysql.createPool({
   user: DB_USER,
   password: DB_PASSWORD,
   database: DB_NAME,
-  port: PORT,
+  // port: PORT,
 });
 
 const testConnection = async () => {
