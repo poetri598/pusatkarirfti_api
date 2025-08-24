@@ -8,7 +8,7 @@ import { success, fail, error } from "../utils/responseController.js";
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "Strict",
+  sameSite: "None",
   path: "/",
 };
 
@@ -101,12 +101,7 @@ export async function Logout(req, res) {
   if (!refresh_token) return fail(res, "Refresh token wajib diisi", 400);
   try {
     await deleteRefreshToken(refresh_token);
-    res.clearCookie("refresh_token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      path: "/",
-    });
+    res.clearCookie("refresh_token", COOKIE_OPTIONS);
     return success(res, "Berhasil keluar", null, 200);
   } catch (err) {
     return error(res, 500, err.message);
